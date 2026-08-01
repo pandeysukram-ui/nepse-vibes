@@ -156,6 +156,7 @@
     </div>
     <div style="display:flex;gap:6px;align-items:center;">
       <button class="print-btn" onclick="window.print()">⬇ EXPORT</button>
+      <button class="print-btn" style="background:linear-gradient(135deg,#3a1a5c,#5c0d8f);border-color:#5a1e8a;color:#c87ef7;" onclick="bakeDrilldown()" title="Bakes today's data (manual edits + synced-from-QML sector data) into a fresh copy of this whole page">💾 BAKE</button>
       <div style="font-size:9px;font-family:'Share Tech Mono',monospace;text-align:right;">
         <span id="hdr-nepse-price" style="color:#00ff99;font-weight:700;">NEPSE 2,736.17</span><br>
         <span id="hdr-nepse-chg" style="color:#00e5a0;">▲ +0.09% TODAY</span>
@@ -341,6 +342,7 @@ function syncFromQML(){
   }catch(e){return false;}
 }
 const ddSynced=syncFromQML();
+loadDrilldownScrips();
 const sign=v=>v>=0?'+':'';
 const f2=v=>parseFloat(v).toFixed(2);
 
@@ -758,11 +760,33 @@ function buildL2Bars(){
 
 function getScrip(sym,sn){return(SCRIPS[sn]||[]).find(s=>s.sym===sym);}
 function goToScrip(sym){if(window.parent!==window){window.parent.postMessage({type:'gotoScrip',sym:sym},'*');}}
+function saveDrilldownScrips(){
+  try{localStorage.setItem('twv_drilldown_scrips',JSON.stringify(SCRIPS));}catch(e){}
+}
+function loadDrilldownScrips(){
+  try{
+    var raw=localStorage.getItem('twv_drilldown_scrips');
+    if(raw){var saved=JSON.parse(raw);Object.keys(saved).forEach(function(k){SCRIPS[k]=saved[k];});}
+  }catch(e){}
+}
+function bakeDrilldown(){
+  var keys=['twv_scrip_states','twv_sector_breadth','twv_screener_live','twv_sector_override','twv_drilldown_scrips'];
+  var seed={};
+  keys.forEach(function(k){var v=localStorage.getItem(k);if(v!==null)seed[k]=v;});
+  var html=document.documentElement.outerHTML;
+  var seedScript='<script>(function(){var seed='+JSON.stringify(seed)+';for(var k in seed){try{localStorage.setItem(k,seed[k]);}catch(e){}}})();<\/script>\n</head>';
+  html=html.replace('</head>',seedScript);
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download='drilldown_page_'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();
+}
 function commit(sym,sn,el,field){
   const raw=el.value.replace('%','').replace(/,/g,'').trim();
   const val=parseFloat(raw);const s=getScrip(sym,sn);
   if(isNaN(val)||!s){el.value=field==='ltp'?s.ltp.toLocaleString():f2(s.chg)+'%';return;}
   s[field]=val;s.manualEdit=true;el.value=field==='ltp'?val.toLocaleString():f2(val)+'%';
+  saveDrilldownScrips();
   const row=el.closest('tr');if(row){row.classList.remove('updated-flash');void row.offsetWidth;row.classList.add('updated-flash');}
   refreshRow(sym,sn);
 }
@@ -788,13 +812,15 @@ function addScripL2(sn){
   const chg=parseFloat(document.getElementById('s-chg').value);
   if(!sym||isNaN(ltp)||isNaN(chg)){alert('Fill Symbol, LTP, CHG%');return;}
   if((SCRIPS[sn]||[]).find(s=>s.sym===sym)){alert('Already added');return;}
-  SCRIPS[sn].push({sym,ltp,chg});
+  SCRIPS[sn].push({sym,ltp,chg,manualEdit:true});
   ['s-sym','s-ltp','s-chg'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('l2-body').innerHTML=buildL2Body(selectedSec,SCRIPS[sn]);
+  saveDrilldownScrips();
 }
 function delScrip(sym,sn){
   SCRIPS[sn]=SCRIPS[sn].filter(s=>s.sym!==sym);
   document.getElementById('l2-body').innerHTML=buildL2Body(selectedSec,SCRIPS[sn]);
+  saveDrilldownScrips();
 }
 
 function updateTodayCard(){

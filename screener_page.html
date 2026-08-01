@@ -87,6 +87,9 @@ tr:hover td{background:var(--color-background-secondary)}
   <button class="qml-btn" style="background:linear-gradient(135deg,#5c3a1a,#8f5c0d);border-color:#8a5a1e;color:#f7c87e;" onclick="exportScreenerExcel()" title="Export the current (filtered/sorted) screener view as an Excel file">
     <i class="ti ti-file-spreadsheet"></i>Export Excel
   </button>
+  <button class="qml-btn" style="background:linear-gradient(135deg,#3a1a5c,#5c0d8f);border-color:#5a1e8a;color:#c87ef7;" onclick="bakeScreener()" title="Bakes today's imported live data into a fresh copy of this whole Screener page — upload that file so every visitor sees today's data, not just you">
+    <i class="ti ti-device-floppy"></i>Bake &amp; Download
+  </button>
   <a class="qml-btn" href="https://qml-v2.tiiny.site" target="_blank" onclick="if(window.parent!==window){window.parent.postMessage({type:'gotoTab',tab:'qml'},'*');return false;}"><i class="ti ti-external-link"></i>QML Dashboard</a>
   <div class="sw"><i class="ti ti-search" style="font-size:13px;color:var(--color-text-secondary)"></i>
     <input type="text" id="q" placeholder="Search symbol…" oninput="go()">
@@ -244,6 +247,22 @@ function w52p(l,h,lo){const r=h-lo;return r>0?(l-lo)/r:0.5;}
 function ltpB(l){return l<200?'u200':l<500?'200-500':l<1000?'500-1000':'1000p';}
 function pbvBkt(l,b){if(!b)return null;const r=l/b;return r<1?'u1':r<2?'1-2':r<5?'2-5':'5p';}
 function pbvCol(r){return r<1?['#E1F5EE','#0F6E56']:r<2?['#E6F1FB','#185FA5']:r<5?['#FAEEDA','#BA7517']:['#FAECE7','#993C1D'];}
+function bakeScreener(){
+  saveScreenerLive();
+  var keys=['twv_screener_live','twv_sector_override'];
+  var seed={};
+  keys.forEach(function(k){var v=localStorage.getItem(k);if(v!==null)seed[k]=v;});
+  var html=document.documentElement.outerHTML;
+  var seedScript='<script>(function(){var seed='+JSON.stringify(seed)+';for(var k in seed){try{localStorage.setItem(k,seed[k]);}catch(e){}}})();<\/script>\n</head>';
+  html=html.replace('</head>',seedScript);
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download='screener_page_'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();
+  var st=document.getElementById('screener-csv-status');
+  st.textContent='\u2713 Screener baked \u2014 upload this to replace screener_page.html';
+  st.style.color='#c87ef7';
+}
 function saveScreenerLive(){
   try{
     var out={};
