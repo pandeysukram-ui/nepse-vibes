@@ -203,17 +203,8 @@ body{background:#0a0d0f;font-family:'Share Tech Mono',monospace;color:#c8d6e0;mi
 
   <!-- Presets -->
   <div style="margin-bottom:8px">
-    <div style="font-size:7px;color:#4a7a6a;letter-spacing:1.5px;font-family:'Chakra Petch',sans-serif;margin-bottom:4px">QUICK LOAD</div>
-    <div class="pr-row">
-      <button class="pb" onclick="loadP('NABIL','Banking',680,820,750)">NABIL</button>
-      <button class="pb" onclick="loadP('NICA','Insurance',560,670,615)">NICA</button>
-      <button class="pb" onclick="loadP('HRL','Hydropower',180,225,200)">HRL</button>
-      <button class="pb" onclick="loadP('NRIC','Insurance',1100,1280,1190)">NRIC</button>
-      <button class="pb" onclick="loadP('UPPER','Hydropower',155,195,172)">UPPER</button>
-      <button class="pb" onclick="loadP('NHPC','Hydropower',58,72,65)">NHPC</button>
-      <button class="pb" onclick="loadP('GBIME','Banking',245,298,268)">GBIME</button>
-      <button class="pb" onclick="loadP('NLG','Insurance',1950,2180,2060)">NLG</button>
-    </div>
+    <div style="font-size:7px;color:#4a7a6a;letter-spacing:1.5px;font-family:'Chakra Petch',sans-serif;margin-bottom:4px">QUICK LOAD <span style="color:#3a5a4a;">(max 8 \u2014 oldest auto-removed)</span></div>
+    <div class="pr-row" id="presetRow"></div>
   </div>
 
   <!-- Row 1: Identity -->
@@ -827,14 +818,70 @@ function drawHex(){
 }
 
 // ── PRESET LOADER ────────────────────────────────────────
-function loadP(scrip,sector,lo,hi,cur){
+function loadP(scrip,sector,lo,hi,cur,w52h,w52l,openP){
   document.getElementById('scrip').value=scrip;
   document.getElementById('sector').value=sector;
   document.getElementById('swLow').value=lo;
   document.getElementById('swHigh').value=hi;
   document.getElementById('curP').value=cur;
+  if(w52h)document.getElementById('w52h').value=w52h;
+  if(w52l)document.getElementById('w52l').value=w52l;
+  if(openP)document.getElementById('openP').value=openP;
   autoMHL();
   setStatus(true,`${scrip} loaded — MHL auto-calculated — press Calculate`,'p');
+}
+
+// ── QUICK LOAD PRESETS: max 8, FIFO, add/remove, persisted ──
+const DEFAULT_PRESETS=[
+  {scrip:'NABIL',sector:'Banking',lo:680,hi:820,cur:750},
+  {scrip:'NICA',sector:'Insurance',lo:560,hi:670,cur:615},
+  {scrip:'HRL',sector:'Hydropower',lo:180,hi:225,cur:200},
+  {scrip:'NRIC',sector:'Insurance',lo:1100,hi:1280,cur:1190},
+  {scrip:'UPPER',sector:'Hydropower',lo:155,hi:195,cur:172},
+  {scrip:'NHPC',sector:'Hydropower',lo:58,hi:72,cur:65},
+  {scrip:'GBIME',sector:'Banking',lo:245,hi:298,cur:268},
+  {scrip:'NLG',sector:'Insurance',lo:1950,hi:2180,cur:2060}
+];
+function loadPresetList(){
+  try{
+    const raw=localStorage.getItem('twv_gann_presets');
+    return raw?JSON.parse(raw):DEFAULT_PRESETS.slice();
+  }catch(e){return DEFAULT_PRESETS.slice();}
+}
+function savePresetList(list){
+  try{localStorage.setItem('twv_gann_presets',JSON.stringify(list));}catch(e){}
+}
+function renderPresets(){
+  const list=loadPresetList();
+  const row=document.getElementById('presetRow');
+  row.innerHTML=list.map(p=>
+    `<button class="pb" onclick="loadP('${p.scrip}','${p.sector}',${p.lo},${p.hi},${p.cur}${p.w52h?`,${p.w52h},${p.w52l||''},${p.openP||''}`:''})">${p.scrip}</button>`
+  ).join('')+`<button class="pb" style="border-color:#00d4e8;color:#00d4e8;" onclick="addPreset()" title="Add a scrip to Quick Load">+ ADD</button>`;
+}
+function addPreset(){
+  const scrip=(prompt('Scrip name (e.g. EBL):')||'').trim().toUpperCase();
+  if(!scrip)return;
+  const sector=(prompt('Sector (e.g. Banking):','Banking')||'Banking').trim();
+  const lo=parseFloat(prompt('Swing Low:'));
+  const hi=parseFloat(prompt('Swing High:'));
+  const cur=parseFloat(prompt('Current Price:'));
+  if(isNaN(lo)||isNaN(hi)||isNaN(cur)){alert('Swing Low, Swing High, and Current Price are required numbers.');return;}
+  const preset={scrip,sector,lo,hi,cur};
+  if(LEVEL==='pro'){
+    const w52h=parseFloat(prompt('52-Week High (optional \u2014 leave blank to skip):'));
+    const w52l=parseFloat(prompt('52-Week Low (optional \u2014 leave blank to skip):'));
+    const openP=parseFloat(prompt('Open Price (optional \u2014 leave blank to skip):'));
+    if(!isNaN(w52h))preset.w52h=w52h;
+    if(!isNaN(w52l))preset.w52l=w52l;
+    if(!isNaN(openP))preset.openP=openP;
+  }
+  let list=loadPresetList();
+  list=list.filter(p=>p.scrip!==scrip); // avoid duplicate
+  list.push(preset);
+  if(list.length>8)list=list.slice(list.length-8); // FIFO: drop oldest
+  savePresetList(list);
+  renderPresets();
+  loadP(preset.scrip,preset.sector,preset.lo,preset.hi,preset.cur,preset.w52h,preset.w52l,preset.openP);
 }
 
 // ── CLEAR ─────────────────────────────────────────────────
@@ -851,6 +898,7 @@ function clearForm(){
 updateGuide();
 setLevel('novice');
 setMode('bottom');
+renderPresets();
 </script>
 </body>
 </html>

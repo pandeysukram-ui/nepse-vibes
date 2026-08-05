@@ -43,6 +43,10 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 function goTab(name){
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('on',b.dataset.tab===name);});
   document.querySelectorAll('.frames iframe').forEach(function(f){f.classList.toggle('on',f.id==='frame-'+name);});
+  if(name==='drilldown'){
+    var ddFrame=document.getElementById('frame-drilldown');
+    if(ddFrame&&ddFrame.contentWindow)ddFrame.contentWindow.postMessage({type:'resyncFromQML'},'*');
+  }
 }
 function showToast(msg){
   var t=document.getElementById('toast');

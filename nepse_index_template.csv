@@ -1,15 +1,15 @@
 Ticker,Close,Change,Pct,AMOUNT,advance,decline,unchanged,RSI,WMA,DPO,SEB,DC,Ichimuku cloud,Date,strength
-NEPSE,2684.34,-1.2,-0.04,4.57B,126,141,7,51.42,53.22,48.13,2715,2758,Below cloud ( Bearish),Aug 03 2026,-30.66
-Banking subIndex,"1,495.24",3.94,0.26,5.78M,13,4,2,66.93,66.21,69.12,1495,1490,Above cloud(Bullish),August 3 2026,0.24
-Development Bank Index,"5,689.38",13.23,0.23,304.73M,7,9,0,46.31,50.45,34.55,5745,5981,Below cloud ( Bearish),Aug 03 2026,-55.62
-Finance Index,"2,429.41",-7.3,-0.29,162.53M,4,9,0,47.78,50.8,1.96,2449,2517,Below cloud ( Bearish),Aug 03 2026,-19.59
-Hotels And Tourism Index,"7,370.59",1.16,0.01,63.45M,5,3,0,47.34,29.76,29.76,7418,7745,Below cloud ( Bearish),Aug 03 2026,-47.41
-HydroPower Index,"3,716.27",0.31,0,1.56B,45,63,2,49.07,51.5,55.35,3768,3809,Below cloud ( Bearish),Aug 03 2026,-51.73
-Investment Index,98.34,-0.1,-0.1,213.58M,3,4,0,47.81,50.73,1.12,99.88,104.16,Below cloud ( Bearish),Aug 03 2026,-1.54
-Life Insurance,"12,053.94",11.8,0.09,98.62 M,7,7,0,43.53,45.7,-39,12184,12858,Below cloud ( Bearish),Aug 03 2026,-130.06
-Manufacturing And Processing,"10,598.43",-61.12,-0.57,780.65M,6,7,0,45.24,50.31,65.15,10894,10845,Below cloud ( Bearish),Aug 03 2026,-295.57
-Microfinance Index,"4,624.57",14.14,0.3,174.62M,30,19,1,44.49,45.11,-18.65,4660,4908,Below cloud ( Bearish),Aug 03 2026,-35.43
-Mutual Fund,21.21,0.1,0.49,20.418M,30,11,1,43.42,39.1,-0.5,21.26,21.65,Below cloud ( Bearish),Aug 03 2026,-0.05
-Non Life Insurance,"10,782.80",32.84,0.3,38.12M,6,7,0,42.45,45.85,-64.34,10909,11239,Below cloud ( Bearish),Aug 03 2026,-126.2
-Others Index,"1,950.09",-16.33,-0.83,105.74M,1,7,1,47.38,50.31,27.01,1989,2168,Below cloud ( Bearish),Aug 03 2026,-38.91
-Trading Index,"3,348.09",-31.51,-0.93,1.56M,0,1,1,46.49,49.8,14.63,3413,3768,Below cloud ( Bearish),Aug 03 2026,-64.91
+NEPSE,2663.18,-21.15,-0.78,4.07B,59,213,5,46.75,51.52,26.17,2716,2758,Below cloud ( Bearish),Aug 04 2026,-52.82
+Banking subIndex,"1,483.15",-12.09,-0.8,571.62M,3,16,0,60.36,65.2,57.34,1500,1490,Above cloud(Bullish),Aug 04 2026,-16.85
+Development Bank Index,"5,660.70",-28.68,-0.5,292.44M,7,9,0,46.8,49.77,38.1,5748,5981,Below cloud ( Bearish),Aug 04 2026,-87.3
+Finance Index,"2,426.01",-3.4,-0.14,282.44M,6,7,0,47.72,50.1,1.96,2451,2517,Below cloud ( Bearish),Aug 04 2026,-24.99
+Hotels And Tourism Index,"7,325.18",-45.41,-0.61,65.68M,2,5,1,45.62,48.13,11.41,7430,7745,Below cloud ( Bearish),Aug 04 2026,-104.82
+HydroPower Index,"3,695.61",-20.66,-0.55,1.86B,26,83,1,47.42,50.36,40.65,3771,3809,Below cloud ( Bearish),Aug 04 2026,-75.39
+Investment Index,97.63,-0.71,-0.72,111.60M,0,7,0,43.81,62.65,0.38,99.88,104.16,Below cloud ( Bearish),Aug 04 2026,-2.25
+Life Insurance,"11,955.01",-98.93,-0.82,93.42M,2,12,0,39.51,44.66,-126,12169,12858,Below cloud ( Bearish),Aug 04 2026,-213.99
+Manufacturing And Processing,"10,458.59",-139.84,-1.31,421.74M,3,12,1,41.13,47.85,-53.92,10741,10845,Below cloud ( Bearish),Aug 04 2026,-282.41
+Microfinance Index,"4,590.92",-33.65,-0.72,106.42M,6,42,2,39.98,43.59,-50.8,4656,4908,Below cloud ( Bearish),Aug 04 2026,-65.08
+Mutual Fund,21.12,-0.09,-0.44,5.66M,30,11,1,38.94,38.48,-0.48,21.19,21.65,Below cloud ( Bearish),Aug 04 2026,-0.07
+Non Life Insurance,"10,723.60",-59.2,-0.5,45.96M,6,7,0,42.26,45.17,-77.4,10898,11239,Below cloud ( Bearish),Aug 04 2026,-174.4
+Others Index,"1,929.75",-20.34,-1.04,95.96M,1,7,1,43.31,48.82,5.42,1986,2168,Below cloud ( Bearish),Aug 04 2026,-56.25
+Trading Index,"3,308.18",-39.91,-1.19,1.86M,0,1,1,43.11,48.27,14.63,3413,3768,Below cloud ( Bearish),Aug 04 2026,-104.82
