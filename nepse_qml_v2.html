@@ -72,7 +72,7 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
 .cur-tag{position:absolute;right:0;background:#fff;color:#000;font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;transform:translateY(-50%);}
 .czone{position:absolute;left:0;right:0;border-radius:2px;}
 /* INDICATORS */
-.ind-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;}
+.ind-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;}
 .ind-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 11px;}
 .ind-name{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
 .ind-val{font-family:var(--mono);font-size:17px;font-weight:700;color:#fff;}
@@ -605,6 +605,9 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
     <button class="btn-m" onclick="exportCSV()">&#11015; CSV</button>
     <button class="btn-q" onclick="exportXLSX()">&#11015; Excel</button>
     <button class="btn-l" onclick="exportHTML()">&#11015; Snapshot</button>
+    <input type="file" id="chart-img-input" accept="image/png,image/jpeg" style="display:none;" onchange="importChartImage(this)">
+    <button class="btn-muted" onclick="document.getElementById('chart-img-input').click()" title="Attach a chart PNG — only appears inside the Snapshot export, not in the dashboard itself">&#128248; <span id="chart-img-status">Import Chart</span></button>
+    <button class="btn-muted" onclick="openGallery()" title="Browse all saved chart images across scrips and dates">&#128444; Gallery</button>
     <button class="btn-l" onclick="exportFullDashboard()" title="Bakes today's saved data into a fresh copy of this whole dashboard — upload that file to tiiny.site so every visitor sees today's data, not just you">&#128190; Bake &amp; Download</button>
     <button class="btn-muted" onclick="window.print()">Print</button>
   </div>
@@ -623,6 +626,7 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
   <div class="ind-grid" style="margin-bottom:13px;">
     <div class="ind-card"><div class="ind-name">RSI 14</div><div class="ind-val" id="i-rsi">51.25</div><div class="ind-sig sig-neut" id="i-rsi-sig">Neutral</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-rsi-bar" style="width:51%;background:var(--neutral);"></div></div></div>
     <div class="ind-card"><div class="ind-name">WMA 9</div><div class="ind-val" id="i-wma">49.12</div><div class="ind-sig sig-bear" id="i-wma-sig">Weak</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-wma-bar" style="width:49%;background:var(--bear);"></div></div></div>
+    <div class="ind-card"><div class="ind-name">WMA 20 <span style="font-size:7px;color:var(--m);border:1px solid var(--m);border-radius:3px;padding:1px 3px;vertical-align:middle;" title="Auto-calculated from accumulated daily Close prices (Screener CSV imports). Reduces noise vs WMA 9 \u2014 needs 20+ days of collected data.">AUTO</span></div><div class="ind-val" id="i-wma20">\u2014</div><div class="ind-sig sig-neut" id="i-wma20-sig">Building baseline</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-wma20-bar" style="width:0%;background:var(--neutral);"></div></div></div>
     <div class="ind-card"><div class="ind-name">DPO 21</div><div class="ind-val" id="i-dpo" style="color:var(--m);">30.59</div><div class="ind-sig sig-bull" id="i-dpo-sig">Cycle Up</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-dpo-bar" style="width:62%;background:var(--m);"></div></div></div>
     <div class="ind-card"><div class="ind-name">SEB 21</div><div class="ind-val" id="i-seb" style="color:var(--muted);">2,649</div><div class="ind-sig sig-bear" id="i-seb-sig">Below Band</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-seb-bar" style="width:30%;background:var(--bear);"></div></div></div>
     <div class="ind-card"><div class="ind-name">Net Vol <span style="font-size:7px;color:var(--m);border:1px solid var(--m);border-radius:3px;padding:1px 3px;vertical-align:middle;" title="Auto-calculated from this scrip's own OHLCV (money-flow volume) when EOD CSV is imported and a scrip is selected. Falls back to Volume for index/sub-index. Editable manually in the Edit tab if you want to override.">AUTO</span></div><div class="ind-val bear" id="i-nvol">-3.498B</div><div class="ind-sig sig-bear" id="i-nvol-sig">Distribution</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="i-nvol-bar" style="width:20%;background:var(--bear);"></div></div></div>
@@ -1249,6 +1253,7 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
       </div>
     </div>
     <button class="btn-m" style="width:100%;margin-top:9px;" onclick="savePlan()">&#10010; Save Plan</button>
+    <button class="btn-m" style="width:100%;margin-top:6px;" onclick="syncPlansToAlerts()">&#9993; Sync All Plans to Email Alerts</button>
   </div>
   <div class="panel">
     <div class="panel-head">
@@ -2185,6 +2190,8 @@ function sInd(vid,vsig,vbar,val,sig,cls,num,max,col){
 
 function renderDashboard(){
   updateFreshnessBanner();
+  var chartImgStatusEl = document.getElementById('chart-img-status');
+  if(chartImgStatusEl) chartImgStatusEl.textContent = getChartImage() ? 'Chart attached \u2713' : 'Import Chart';
   var c=state.close;
   document.getElementById('hdr-price').textContent=state.ticker+' '+fmt(c);
   var bear=(state.chg||'').indexOf('-')>-1;
@@ -2202,6 +2209,20 @@ function renderDashboard(){
   var r=state.rsi,w=state.wma,d=state.dpo,s=state.seb;
   sInd('i-rsi','i-rsi-sig','i-rsi-bar',r.toFixed(2),r>60?'Overbought':r<40?'Oversold':'Neutral',r>60?'bull':r<40?'bear':'neut',r,100,r>50?'var(--bull)':'var(--neutral)');
   sInd('i-wma','i-wma-sig','i-wma-bar',w.toFixed(2),r>w?'RSI>WMA \u25b2':'RSI<WMA \u25bc',r>w?'bull':'bear',w,100,r>w?'var(--bull)':'var(--bear)');
+  var w20r=calcWMA20(state.ticker);
+  var w20El=document.getElementById('i-wma20'),w20SigEl=document.getElementById('i-wma20-sig'),w20BarEl=document.getElementById('i-wma20-bar');
+  if(w20El){
+    if(w20r.wma===null){
+      w20El.textContent='\u2014';
+      if(w20SigEl)w20SigEl.textContent='Building '+w20r.days+'/20d';
+      if(w20BarEl){w20BarEl.style.width='0%';w20BarEl.style.background='var(--neutral)';}
+    } else {
+      var above20=c>w20r.wma;
+      w20El.textContent=w20r.wma.toFixed(2);
+      if(w20SigEl){w20SigEl.textContent=above20?'Price>WMA20 \u25b2':'Price<WMA20 \u25bc';w20SigEl.className='ind-sig '+(above20?'sig-bull':'sig-bear');}
+      if(w20BarEl){w20BarEl.style.width=Math.min(100,Math.abs((c-w20r.wma)/w20r.wma*500)+30)+'%';w20BarEl.style.background=above20?'var(--bull)':'var(--bear)';}
+    }
+  }
   sInd('i-dpo','i-dpo-sig','i-dpo-bar',d.toFixed(2),d>0?'Cycle Up':'Cycle Down',d>0?'bull':'bear',Math.min(Math.abs(d)*1.5,100),100,d>0?'var(--m)':'var(--bear)');
   sInd('i-seb','i-seb-sig','i-seb-bar',fmt(s),c>s?'Above SEB '+fmt(s):'Below SEB '+fmt(s),c>s?'bull':'bear',c>s?70:30,100,c>s?'var(--bull)':'var(--bear)');
   // DC-89 indicator
@@ -2368,7 +2389,18 @@ function renderSectorBreadth(){
         +'</div>';
     }
 
-    div.innerHTML=nameDiv+closeDiv+pctDiv+bdDiv;
+    // Prior-day carry-forward (fixes: only today's value was showing, day1/day2 got dropped on each new import)
+    var prevDiv='';
+    var trailInfo=getIndexTrail(s.k);
+    if(trailInfo&&trailInfo.prev){
+      var pv=trailInfo.prev.close;
+      var arrow=pv<(p.state.close||0)?'▲':pv>(p.state.close||0)?'▼':'—';
+      var arrowCol=pv<(p.state.close||0)?'var(--bull)':pv>(p.state.close||0)?'var(--bear)':'var(--muted)';
+      prevDiv='<div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:2px;" title="Previous imported day">'
+        +'prev '+pv.toLocaleString()+' <span style="color:'+arrowCol+';">'+arrow+'</span></div>';
+    }
+
+    div.innerHTML=nameDiv+closeDiv+pctDiv+bdDiv+prevDiv;
     div.onclick=(function(key){return function(){
       loadPreset(key);
       if(sectorScripMap[key]) showSectorScrips(key);
@@ -2735,6 +2767,34 @@ function savePlan(){
 function deletePlan(id){plans=plans.filter(function(p){return p.id!==id;});savePlansData();renderPlansTable();toast('Plan removed');}
 function savePlansData(){try{localStorage.setItem('twv_plans',JSON.stringify(plans));}catch(e){}}
 function loadPlans(){try{var s=localStorage.getItem('twv_plans');if(s)plans=JSON.parse(s);}catch(e){}}
+
+// Pushes the saved Planner rows to the backend so email alerts are driven by
+// whatever's actually in the Planner, not a separate manually-typed watch.
+function syncPlansToAlerts(){
+  if(!plans.length){toast('\u26a0 No saved plans yet \u2014 Save a plan first');return;}
+  var email=localStorage.getItem('twv_alert_email');
+  if(!email){
+    email=prompt('Email for alerts (first time only \u2014 remembered after this):');
+    if(!email)return;
+    localStorage.setItem('twv_alert_email',email);
+  }
+  fetch('Nepse-Backend/sync_planner.php',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:email, plans:plans})
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){
+    if(res.success){
+      toast(res.verified
+        ? '\u2713 '+res.watches_synced+' plan(s) synced to alerts'
+        : '\u2713 Synced \u2014 check '+email+' to verify (one-time)');
+    } else {
+      toast('\u26a0 Sync failed: '+(res.error||'unknown error'));
+    }
+  })
+  .catch(function(){toast('\u26a0 Could not reach alert server');});
+}
 function renderPlansTable(){
   var tbody=document.getElementById('plans-tbody');if(!tbody)return;
   if(!plans.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;padding:16px;">No plans saved</td></tr>';return;}
@@ -2991,6 +3051,20 @@ function qsInput(val){
   dd.style.display='block';
 }
 function qsSelect(scrip){document.getElementById('quick-search').value=scrip;document.getElementById('qs-dd').style.display='none';qsGo(scrip);}
+function calcWMA20(sym){
+  try{
+    var hist=JSON.parse(localStorage.getItem('twv_scrip_price_history')||'[]');
+    var today=new Date().toISOString().split('T')[0];
+    var series=hist.filter(function(h){return h.prices&&h.prices[sym]!==undefined;})
+                    .map(function(h){return{date:h.date,price:h.prices[sym]};});
+    // include today's snapshot too if not already in history (same-day re-import already replaces it)
+    if(series.length<20)return{wma:null,days:series.length};
+    var last20=series.slice(series.length-20);
+    var wSum=0,pSum=0;
+    last20.forEach(function(pt,i){var w=i+1;wSum+=w;pSum+=pt.price*w;}); // more weight on recent days
+    return{wma:pSum/wSum,days:series.length};
+  }catch(e){return{wma:null,days:0};}
+}
 function qsGo(scrip){
   scrip=scrip||(document.getElementById('quick-search').value.toUpperCase().trim());
   if(!scrip)return;
@@ -3179,16 +3253,102 @@ function exportFullDashboard(){
   a.click();
   toast('\u2713 Full dashboard baked \u2014 upload this to tiiny.site');
 }
+// Chart images are kept as a dated history per ticker (not shown anywhere in
+// the main dashboard UI) and build up over time into a browsable Gallery.
+function importChartImage(input){
+  var file = input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var store = JSON.parse(localStorage.getItem('twv_chart_images')||'{}');
+      if(!store[state.ticker]) store[state.ticker]=[];
+      // same-day re-import overwrites today's entry rather than duplicating
+      var todayEntry = store[state.ticker].find(function(x){return x.date===state.date;});
+      if(todayEntry){ todayEntry.img = e.target.result; }
+      else { store[state.ticker].push({date: state.date, img: e.target.result}); }
+      store[state.ticker].sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+      localStorage.setItem('twv_chart_images', JSON.stringify(store));
+      document.getElementById('chart-img-status').textContent = 'Chart attached \u2713';
+      toast('\u2713 Chart image saved to gallery ('+store[state.ticker].length+' for '+state.ticker+')');
+    }catch(err){
+      toast('\u26a0 Could not save image (too large? try a smaller PNG)');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+function getChartImage(){
+  try{
+    var store = JSON.parse(localStorage.getItem('twv_chart_images')||'{}');
+    var arr = store[state.ticker];
+    if(!arr||!arr.length) return null;
+    // prefer today's exact image if present, else the most recent one
+    var todayEntry = arr.find(function(x){return x.date===state.date;});
+    return todayEntry ? todayEntry.img : arr[arr.length-1].img;
+  }catch(e){ return null; }
+}
+function openGallery(){
+  var store = {};
+  try{ store = JSON.parse(localStorage.getItem('twv_chart_images')||'{}'); }catch(e){}
+  var tickers = Object.keys(store).filter(function(t){return store[t]&&store[t].length;}).sort();
+  var overlay = document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(2,6,12,0.92);z-index:9999;overflow-y:auto;padding:24px;';
+  var html = '<div style="max-width:1000px;margin:0 auto;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">'
+    +'<h2 style="color:#fff;font-family:sans-serif;margin:0;">\ud83d\uddbc Chart Gallery</h2>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:#1B2C45;color:#C9D6E8;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">\u2715 Close</button>'
+    +'</div>';
+  if(!tickers.length){
+    html += '<p style="color:#5C7089;">No chart images saved yet \u2014 use \u201cImport Chart\u201d on any scrip to start building the gallery.</p>';
+  }
+  tickers.forEach(function(t){
+    html += '<div style="margin-bottom:24px;"><div style="color:#2EE6D6;font-family:sans-serif;font-weight:600;margin-bottom:8px;">'+t+' ('+store[t].length+')</div>'
+      +'<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+    store[t].slice().reverse().forEach(function(entry){
+      html += '<div style="text-align:center;">'
+        +'<img src="'+entry.img+'" style="width:140px;height:90px;object-fit:cover;border:1px solid #1B2C45;border-radius:4px;cursor:pointer;" onclick="window.open(this.src,\'_blank\')">'
+        +'<div style="color:#5C7089;font-size:10px;margin-top:4px;font-family:monospace;">'+entry.date+'</div>'
+        +'</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay);
+}
+
 function exportHTML(){
-  var snap='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>QML '+state.ticker+' '+state.date+'</title><style>body{font-family:monospace;background:#070b12;color:#c8d8e8;padding:20px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}th,td{border:1px solid rgba(255,255,255,0.1);padding:6px 11px;font-size:11px;}th{background:rgba(255,255,255,0.05);color:#6a7f95;}.q{color:#7c6af0;}.m{color:#1ab87a;}.l{color:#e8a030;}.bear{color:#e74c3c;}.bull{color:#2ecc71;}</style></head><body>'
+  var close = state.close;
+  var t1DistPct = pct(state.t1lo, close);
+  var t2DistPct = pct(state.t2lo, close);
+  var risk = Math.abs(state.entryHi - state.sl);
+  var reward = Math.abs(state.t1lo - state.entryHi);
+  var rr = risk>0 ? (reward/risk).toFixed(1) : '0.0';
+  var signalMark = (state.sigQ||'')+' \u00b7 '+(state.sigM||'')+' \u00b7 '+(state.sigL||'');
+
+  var snap='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>QML '+state.ticker+' '+state.date+'</title><style>body{font-family:monospace;background:#070b12;color:#c8d8e8;padding:20px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}th,td{border:1px solid rgba(255,255,255,0.1);padding:6px 11px;font-size:11px;}th{background:rgba(255,255,255,0.05);color:#6a7f95;}.q{color:#7c6af0;}.m{color:#1ab87a;}.l{color:#e8a030;}.bear{color:#e74c3c;}.bull{color:#2ecc71;}.tp-box{background:rgba(124,106,240,0.08);border:1px solid rgba(124,106,240,0.3);border-radius:6px;padding:12px;margin-bottom:16px;}.rr-badge{margin-top:8px;display:inline-block;background:rgba(124,106,240,0.13);border:1px solid rgba(124,106,240,0.28);border-radius:3px;font-size:10px;color:#7c6af0;padding:5px 11px;}</style></head><body>'
     +'<h1 style="color:#fff;font-size:15px;margin-bottom:4px;">'+state.ticker+' QML Setup</h1>'
     +'<p style="color:#6a7f95;font-size:10px;margin-bottom:14px;">Trade With Vibes \u00b7 '+fmtDate(state.date)+' \u00b7 Close: '+fmt(state.close)+'</p>'
     +'<table><tr><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Vol</th></tr><tr><td>'+fmt(state.open)+'</td><td class="bull">'+fmt(state.high)+'</td><td class="bear">'+fmt(state.low)+'</td><td><b>'+fmt(state.close)+'</b></td><td>'+state.vol+'</td></tr></table>'
+    +'<div class="tp-box"><b style="color:#7c6af0;">\u25c8 QML Trade Plan</b><br><span style="font-size:11px;">'
+    +'\ud83c\udfaf Entry Zone: <b>'+fmt(state.entryLo)+' \u2013 '+fmt(state.entryHi)+'</b><br>'
+    +'\ud83d\udee1\ufe0f Stop Loss: <b class="bear">'+fmt(state.sl)+'</b><br>'
+    +'\ud83c\udfc1 Target 1 (M): <b>'+fmt(state.t1lo)+' \u2013 '+fmt(state.t1hi)+'</b> \u2014 <span style="color:#6a7f95;">\u23f3 '+t1DistPct+'% to T1 ('+fmt(state.t1lo)+')</span><br>'
+    +'\ud83c\udfc1 Target 2 (Q): <b>'+fmt(state.t2lo)+' \u2013 '+fmt(state.t2hi)+'</b> \u2014 <span style="color:#6a7f95;">\u23f3 '+t2DistPct+'% to T2 ('+fmt(state.t2lo)+')</span><br>'
+    +'\u26a0\ufe0f Scenario B: <b class="bear">Below '+fmt(state.entryLo)+'</b> \u00b7 Next '+fmt(state.sl)+'<br>'
+    +'\ud83d\udcdd Signal Mark: <b>'+signalMark+'</b>'
+    +'<div class="rr-badge">R:R \u2248 1:'+rr+' \u00b7 Entry '+fmt(state.entryHi)+' \u2192 SL '+fmt(state.sl)+' \u2192 T1 '+fmt(state.t1lo)+'</div>'
+    +'</span></div>'
     +'<table><tr><th>Tier</th><th>Type</th><th>Price</th><th>Dist%</th><th>Note</th></tr>';
   levels.slice().sort(function(a,b){return b.price-a.price;}).forEach(function(lv){
     snap+='<tr><td class="'+lv.tier.toLowerCase()+'"><b>'+lv.tier+'</b></td><td>'+lv.type+'</td><td><b>'+fmt(lv.price)+'</b></td><td>'+pct(lv.price,state.close)+'%</td><td>'+lv.note+'</td></tr>';
   });
-  snap+='</table><p style="color:#6a7f95;font-size:9px;">nepsevibes.com \u00b7 '+new Date().toLocaleString()+'</p></body></html>';
+  snap += '</table>';
+  var chartImg = getChartImage();
+  if(chartImg){
+    snap += '<img src="'+chartImg+'" style="width:100%;max-width:900px;border:1px solid rgba(255,255,255,0.1);border-radius:4px;margin-bottom:16px;display:block;">';
+  }
+  snap+='<p style="color:#6a7f95;font-size:9px;">nepsevibes.com \u00b7 '+new Date().toLocaleString()+'</p></body></html>';
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([snap],{type:'text/html'}));a.download='QML_'+state.ticker+'_'+state.date+'.html';a.click();toast('\u2713 Snapshot saved');
 }
 
@@ -3296,6 +3456,36 @@ function autoFillPosition(scrip){
 // ROLLING PRICE HISTORY
 // ==============================
 var priceHistory={};
+var indexHistory={}; // date-keyed history for NEPSE + sub-indices (Close, RSI, WMA, DPO) from Index Template CSV imports
+
+function loadIndexHistory(){
+  try{
+    var s=localStorage.getItem('twv_index_history');
+    indexHistory=s?JSON.parse(s):{};
+  }catch(e){indexHistory={};}
+}
+function saveIndexHistoryEntry(ticker,dateStr,entry){
+  if(!ticker) return;
+  if(!indexHistory[ticker]) indexHistory[ticker]=[];
+  var d=dateStr||new Date().toISOString().split('T')[0];
+  var last=indexHistory[ticker][indexHistory[ticker].length-1];
+  if(last&&last.date===d){
+    // same day re-import (e.g. re-uploading today's file) -- update in place, don't duplicate
+    indexHistory[ticker][indexHistory[ticker].length-1]=Object.assign({},entry,{date:d});
+  } else {
+    indexHistory[ticker].push(Object.assign({},entry,{date:d}));
+    if(indexHistory[ticker].length>30) indexHistory[ticker]=indexHistory[ticker].slice(-30);
+  }
+}
+function persistIndexHistory(){
+  try{localStorage.setItem('twv_index_history',JSON.stringify(indexHistory));}catch(e){}
+}
+// Returns {prev, prevDate, trail:[...]} for the ticker, excluding today's own last entry
+function getIndexTrail(ticker){
+  var h=indexHistory[ticker];
+  if(!h||h.length<2) return null;
+  return {prev:h[h.length-2],trail:h.slice(-6,-1)};
+}
 
 function saveHistoryFromEOD(){
   // Called after each EOD import
@@ -3944,6 +4134,29 @@ function splitCSVLine(line){
   out.push(cur);
   return out.map(function(c){return c.replace(/,/g,'');}); // strip thousands-separator commas left inside numbers
 }
+function syncFileToBackend(file, endpoint, statusEl){
+  var key = localStorage.getItem('twv_backend_key');
+  if(!key){
+    key = prompt('Backend API key (one-time \u2014 remembered after this, same key as config.php):');
+    if(!key) return; // user skipped; local import still succeeded, just not backend-synced
+    localStorage.setItem('twv_backend_key', key);
+  }
+  var fd = new FormData();
+  fd.append('csv', file);
+  fetch('Nepse-Backend/'+endpoint+'?key='+encodeURIComponent(key), { method:'POST', body: fd })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.success){
+        toast('\u2601 Backend synced ('+res.rows_saved+' rows) \u2014 now visible on other devices');
+      } else {
+        toast('\u26a0 Backend sync failed: '+(res.error||'unknown'));
+      }
+    })
+    .catch(function(){
+      toast('\u26a0 Backend unreachable \u2014 local data saved, but not synced');
+    });
+}
+
 function parseIdxCSV(file){
   var status=document.getElementById('idx-csv-status');
   status.textContent='Reading...';
@@ -4004,6 +4217,9 @@ function parseIdxCSV(file){
         saveScripState(ticker,base);
         presets[ticker].state=JSON.parse(JSON.stringify(base)); // keep in-memory defaults in sync too
 
+        // carry this import forward into dated history so drill-down keeps prior days, not just today
+        saveIndexHistoryEntry(ticker,dateStr,{close:close,chg:chg,pct:pct,rsi:rsi,wma:wma,dpo:dpo});
+
         // breadth
         if(ticker==='NEPSE'){
           sectorBreadthData.totalAdv=adv;sectorBreadthData.totalDec=dec;sectorBreadthData.totalUnc=unc;
@@ -4015,6 +4231,7 @@ function parseIdxCSV(file){
       });
       if(count>0){
         saveSectorBreadth();
+        persistIndexHistory();
         // Reload current preset if it was updated
         if(presets[state.ticker]){
           var refreshed=loadSavedScripState(state.ticker);
@@ -4026,6 +4243,9 @@ function parseIdxCSV(file){
         status.textContent='\u2713 '+count+' indices updated (full data linked)';
         status.style.color='var(--bull)';
         toast('\u2713 '+count+' indices updated \u2014 all fields linked!');
+        // Auto-send the same file to the backend so alerts/other-device access
+        // stay in sync without a separate manual upload step.
+        syncFileToBackend(file, 'upload_index.php', status);
       } else {
         status.textContent='\u26a0 No valid index data found';
         status.style.color='var(--bear)';
@@ -4196,6 +4416,7 @@ try{
   }
 }catch(e){}
 loadSectorBreadth();
+loadIndexHistory();
 loadSavedState();
 loadEODFromStorage();
 loadHistory();
