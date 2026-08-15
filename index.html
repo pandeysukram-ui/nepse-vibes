@@ -104,7 +104,7 @@ var OWNER_EMAIL = 'pandeysukram@gmail.com';
 var VERIFY_TTL_MS = 10*60*1000;      // code valid for 10 minutes
 var SESSION_TTL_DAYS = 30;           // stay logged in for 30 days on this device
 
-(function(){ if(window.emailjs) emailjs.init(EMAILJS_PUBLIC_KEY); })();
+(function(){ if(window.emailjs) emailjs.init({publicKey: EMAILJS_PUBLIC_KEY}); })();
 
 function twvSetMsg(id,text,ok){
   var el=document.getElementById(id);
