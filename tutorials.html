@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade With Vibes — Tutorials</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+
+:root{
+  --bg:#040B16;
+  --panel:#0a1420;
+  --line:rgba(100,200,160,0.14);
+  --mint:#64c8a0;
+  --amber:#f0b429;
+  --red:#e05c5c;
+  --txt:#c8d6e0;
+  --dim:#4a7a6a;
+  --dim2:#2a4a3a;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--txt);font-family:'Share Tech Mono',monospace;
+  margin:0;min-height:100vh;padding:28px 20px 60px;position:relative;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg, rgba(100,200,160,0.025) 0px, rgba(100,200,160,0.025) 1px, transparent 1px, transparent 3px);
+  pointer-events:none;z-index:1;
+}
+.wrap{max-width:1180px;margin:0 auto;position:relative;z-index:2}
+
+header{margin-bottom:26px}
+.brand{font-family:'Chakra Petch',sans-serif;font-weight:700;color:var(--amber);font-size:13px;letter-spacing:2px}
+h1{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:24px;color:var(--mint);margin:4px 0 2px;letter-spacing:0.5px}
+.sub{font-size:11px;color:var(--dim);letter-spacing:1px}
+
+.section-head{display:flex;align-items:center;gap:10px;margin:30px 0 14px}
+.section-head h2{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;color:var(--txt);
+  letter-spacing:1.5px;margin:0;white-space:nowrap;
+}
+.section-head .line{flex:1;height:1px;background:var(--line)}
+.section-head .badge{font-size:9px;color:var(--dim);letter-spacing:1px;background:var(--panel);border:1px solid var(--line);padding:3px 9px;border-radius:3px}
+
+.grid-long{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.card-long{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.card-long:hover{transform:translateY(-3px);border-color:rgba(100,200,160,0.4);box-shadow:0 10px 26px rgba(0,0,0,0.4)}
+.video-frame{aspect-ratio:16/9;width:100%;background:#060a0f;position:relative}
+.video-frame iframe{width:100%;height:100%;border:0;display:block}
+.card-long .info{padding:12px 14px}
+.card-long .title{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13px;color:var(--txt);margin-bottom:4px;line-height:1.3}
+.card-long .meta{font-size:9px;color:var(--dim);letter-spacing:0.5px}
+
+.grid-shorts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.card-short{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.card-short:hover{transform:translateY(-3px);border-color:rgba(240,180,41,0.4);box-shadow:0 10px 26px rgba(0,0,0,0.4)}
+.short-frame{aspect-ratio:9/16;width:100%;background:#060a0f}
+.short-frame iframe{width:100%;height:100%;border:0;display:block}
+.card-short .info{padding:9px 11px}
+.card-short .title{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;color:var(--txt);line-height:1.3}
+
+.empty{
+  padding:40px 20px;text-align:center;color:var(--dim2);font-size:11px;letter-spacing:1px;
+  border:1.5px dashed var(--dim2);border-radius:8px;background:var(--panel);
+}
+
+.howto{
+  margin-top:40px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  font-size:11px;color:var(--dim);line-height:1.8;
+}
+.howto b{color:var(--mint);font-family:'Chakra Petch',sans-serif}
+.howto code{background:#060f13;color:var(--amber);padding:1px 6px;border-radius:3px;font-size:10px}
+
+@media(max-width:520px){h1{font-size:19px}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">▸ TRADE WITH VIBES</div>
+    <h1>TUTORIALS</h1>
+    <div class="sub">DASHBOARD WALKTHROUGHS · QUICK TIPS · NEPSE ANALYSIS</div>
+  </header>
+
+  <div class="section-head">
+    <h2>▸ FULL TUTORIALS</h2>
+    <div class="line"></div>
+    <span class="badge" id="longCount">0</span>
+  </div>
+  <div class="grid-long" id="longGrid"></div>
+
+  <div class="section-head">
+    <h2>▸ SHORTS</h2>
+    <div class="line"></div>
+    <span class="badge" id="shortCount">0</span>
+  </div>
+  <div class="grid-shorts" id="shortGrid"></div>
+
+  <div class="howto">
+    <b>▸ HOW TO ADD VIDEOS</b><br>
+    Scroll down in this file to the <code>VIDEOS</code> list near the bottom of the script.<br>
+    For a <b>long-form tutorial</b>: add <code>{id:'YOUTUBE_VIDEO_ID', title:'Video Title', meta:'12 min · Dashboard Basics'}</code> to the <code>longVideos</code> array.<br>
+    For a <b>Short</b>: add <code>{id:'SHORT_VIDEO_ID', title:'Short Title'}</code> to the <code>shortVideos</code> array.<br>
+    The video ID is the part after <code>v=</code> in a normal YouTube URL, or after <code>/shorts/</code> for a Short.
+  </div>
+</div>
+
+<script>
+// ── ADD YOUR VIDEOS HERE ──────────────────────────────────────
+// Long-form tutorials (16:9 embeds)
+const longVideos = [
+  // { id:'dQw4w9WgXcQ', title:'How to Read the QML Dashboard', meta:'14 min · Getting Started' },
+  // { id:'dQw4w9WgXcQ', title:'Gann Hexagon Explained', meta:'9 min · Advanced' },
+];
+
+// Shorts (9:16 embeds)
+const shortVideos = [
+  // { id:'abc12345678', title:'3-Second Sector Check' },
+  // { id:'abc12345678', title:'Fear & Greed Meter in 30s' },
+];
+// ─────────────────────────────────────────────────────────────
+
+function renderLong(){
+  const grid = document.getElementById('longGrid');
+  document.getElementById('longCount').textContent = longVideos.length + ' video' + (longVideos.length===1?'':'s');
+  if(!longVideos.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">NO TUTORIALS ADDED YET — SEE INSTRUCTIONS BELOW</div>';
+    return;
+  }
+  grid.innerHTML = longVideos.map(v => `
+    <div class="card-long">
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/${v.id}" title="${v.title}" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="info">
+        <div class="title">${v.title}</div>
+        <div class="meta">${v.meta||''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderShorts(){
+  const grid = document.getElementById('shortGrid');
+  document.getElementById('shortCount').textContent = shortVideos.length + ' short' + (shortVideos.length===1?'':'s');
+  if(!shortVideos.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">NO SHORTS ADDED YET — SEE INSTRUCTIONS BELOW</div>';
+    return;
+  }
+  grid.innerHTML = shortVideos.map(v => `
+    <div class="card-short">
+      <div class="short-frame">
+        <iframe src="https://www.youtube.com/embed/${v.id}" title="${v.title}" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="info"><div class="title">${v.title}</div></div>
+    </div>`).join('');
+}
+
+renderLong();
+renderShorts();
+</script>
+</body>
+</html>
