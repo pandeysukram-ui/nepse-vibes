@@ -249,6 +249,7 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
       <div class="brand-sub">QML DASHBOARD v2.0 · NEPSE · ALL 13 SECTORS · AUTO-SAVE</div>
     </div>
   </div>
+  <button id="qmlVoiceBtn" onclick="speakQMLSnapshot()" style="background:rgba(0,230,118,0.12);border:1px solid #00e676;color:#00e676;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 14px;border-radius:5px;cursor:pointer;letter-spacing:1px;margin-left:auto;margin-right:10px;">🔊 READ ALOUD</button>
   <div style="display:flex;align-items:center;gap:10px;">
     <div style="position:relative;">
       <input id="quick-search" placeholder="Search... VVC" autocomplete="off" style="width:145px;font-size:11px;padding:7px 10px;text-transform:uppercase;" oninput="qsInput(this.value)" onkeydown="if(event.key==='Enter')qsGo()" onfocus="document.getElementById('qs-dd').style.display='block'" onblur="setTimeout(function(){document.getElementById('qs-dd').style.display='none'},200)">
@@ -2909,6 +2910,61 @@ function autoFetchTodayCSV(){
     });
 }
 window.addEventListener('load',autoFetchTodayCSV);
+
+// ── VOICE SNAPSHOT (Web Speech API — free, built into the browser) ──
+// Reads: date + NEPSE (brief) → Panel 1: OHLC + Volume → Panel 2: indicators
+// Aimed at a ~45 second full-market snapshot for a visually-impaired user.
+function twvGetState(){
+  try{ return JSON.parse(localStorage.getItem('twv_state')||'{}'); }catch(e){ return {}; }
+}
+function twvGetEodMeta(){
+  try{
+    return {
+      date: localStorage.getItem('twv_eod_date')||'',
+      count: localStorage.getItem('twv_eod_count')||''
+    };
+  }catch(e){ return {date:'',count:''}; }
+}
+function buildQMLSnapshotText(){
+  var s = twvGetState();
+  var meta = twvGetEodMeta();
+  var today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  var scripName = (typeof activeScrip!=='undefined' && activeScrip) ? activeScrip : 'NEPSE';
+  var parts = [];
+  parts.push(today + '. ' + scripName + ' market snapshot.');
+  if(s && s.close!=null){
+    parts.push('Panel one, index and volume. Open ' + s.open + '. High ' + s.high + '. Low ' + s.low + '. Close ' + s.close + '. Change ' + (s.chg||'') + '. Volume ' + (s.vol||'') + '.');
+    parts.push('Panel two, indicators. R S I: ' + (s.rsi!=null?s.rsi:'not available') + '. W M A: ' + (s.wma!=null?s.wma:'not available') + '. D P O: ' + (s.dpo!=null?s.dpo:'not available') + '. Fifty two week high: ' + (s.w52h!=null?s.w52h:'not available') + '. Fifty two week low: ' + (s.w52l!=null?s.w52l:'not available') + '.');
+    if(s.sigQ) parts.push('Signal: ' + s.sigQ + '.');
+  } else {
+    parts.push('No live index data loaded yet.');
+  }
+  if(meta.count){
+    parts.push(meta.count + ' scrips loaded' + (meta.date?', last updated ' + meta.date:'') + '.');
+  }
+  return parts.join(' ');
+}
+var __qmlVoiceUtterance = null;
+function speakQMLSnapshot(){
+  var btn = document.getElementById('qmlVoiceBtn');
+  if(!('speechSynthesis' in window)){
+    toast('⚠ Voice not supported in this browser');
+    return;
+  }
+  if(window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    if(btn) btn.textContent = '🔊 READ ALOUD';
+    return;
+  }
+  var text = buildQMLSnapshotText();
+  __qmlVoiceUtterance = new SpeechSynthesisUtterance(text);
+  __qmlVoiceUtterance.rate = 0.95;
+  __qmlVoiceUtterance.pitch = 1;
+  __qmlVoiceUtterance.onstart = function(){ if(btn) btn.textContent = '⏸ STOP READING'; };
+  __qmlVoiceUtterance.onend = function(){ if(btn) btn.textContent = '🔊 READ ALOUD'; };
+  __qmlVoiceUtterance.onerror = function(){ if(btn) btn.textContent = '🔊 READ ALOUD'; };
+  window.speechSynthesis.speak(__qmlVoiceUtterance);
+}
 function parseCSV(text){
   function parseLine(line,sep){
     if(sep!==',')return line.split(sep).map(function(c){return c.replace(/^"|"$/g,'').trim();});
