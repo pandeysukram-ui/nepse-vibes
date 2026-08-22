@@ -1,15 +1,15 @@
-Ticker,Close,Change,Pct,AMOUNT,advance,decline,unchanged,RSI,WMA,DPO,SEB,DC,Ichimuku cloud,Date,strength
-NEPSE,2629.5,7.17,0.27,4.41B,132,132,13,40.7,43.51,-33.19,2619.59,2712,Below cloud ( Bearish),Aug 20 2026,16.97
-Banking subIndex,"1,448.50",4.18,0.28,376.62M,12,6,1,44.75,49.77,-10.5,1448.64,1459,above cloud ( Bullish),Aug 20 2026,3.68
-Development Bank Index,"5,511.29",-20.65,-0.37,177.8M,4,11,1,34.12,41.06,-147,5521,5770,Below cloud ( Bearish),Aug 20 2026,-29.78
-Finance Index,"2,328.25",-4.6,-0.19,80.59m,5,8,0,27.68,38.6,-95,2348,2443,Below cloud ( Bearish),Aug 20 2026,-23.79
-Hotels And Tourism Index,"7,222.51",-3.68,-0.05,62.03M,2,5,1,40.06,45.01,-85.01,7249.2,7745,Below cloud ( Bearish),Aug 20 2026,-30.31
-HydroPower Index,"3,750.45",37.06,0.99,2.27B,61,46,4,54.05,50.95,61.18,3711,3809,above cloud ( Bullish),Aug 20 2026,77.04
-Investment Index,95.71,0.05,0.05,88.77M,4,3,0,38.26,43.49,-2.03,95.99,96.42,Below cloud ( Bearish),Aug 20 2026,-0.23
-Life Insurance,"11,636.41",2.93,0.02,90.68M,6,7,1,29.07,34.26,-438,11681,12260,Below cloud ( Bearish),Aug 20 2026,-41.44
-Manufacturing And Processing,"10,402.47",76.45,0.74,470.58M,10,5,0,44.78,41.13,-181,10211,11060,Below cloud ( Bearish),Aug 20 2026,267.92
-Microfinance Index,"4,511.50",-2.6,-0.05,117.15M,22,26,2,32.06,37.35,-115,4513.86,4739,Below cloud ( Bearish),Aug 20 2026,-4.95
-Mutual Fund,20.7,-0.13,-65,10.27M,19,21,4,32.46,37.56,-0.68,20.81,21.36,Below cloud ( Bearish),Aug 20 2026,-0.25
-Non Life Insurance,"10,424.34",-50.63,-0.48,39.94M,4,7,2,31.01,37.25,-387,10601,11069,Below cloud ( Bearish),Aug 20 2026,-227.29
-Others Index,"1,924.31",1.87,0.09,82.72M,2,7,0,44.79,43.75,-24.09,1904,2034,Below cloud ( Bearish),Aug 20 2026,22.19
-Trading Index,"3,275.58",-7.14,-0.21,7.16M,0,1,1,42.91,45.11,-64.15,3272,3572,Below cloud ( Bearish),Aug 20 2026,-3.56
+Ticker,Open,High,Low,Close,Change,Pct,AMOUNT,advance,decline,unchanged,RSI,WMA,DPO,SEB,DC,Ichimuku cloud,Date,strength
+NEPSE,2626.01,2631.14,2614.04,2618.72,-10.68,-0.41,4.12B,82,218,20,37.78,42.53,-46.52,2616.49,2712,Below cloud ( Bearish),Aug 21 2026,2.23
+Banking subIndex,"1,449.92",1451.25,1443.77,"1,447.48",-0.67,-0.05,333.71M,7,8,4,44.4,48.12,-13.11,1446.46,1459,above cloud ( Bullish),Aug 21 2026,1.02
+Development Bank Index,"5,504.24",5571.92,5466.52,"5,481.67",-30.18,-0.55,155.76M,4,12,0,31.22,39.75,-177,5507,5770,Below cloud ( Bearish),Aug 21 2026,-25.33
+Finance Index,"2,325.16",2336.05,2311.18,"2,318.68",-10.15,-0.44,95.04M,2,11,0,25.93,36.99,-105.76,2338,2443,Below cloud ( Bearish),Aug 21 2026,-19.32
+Hotels And Tourism Index,"7,188.83",7301.44,7188.83,"7,214.87",-7.7,-0.11,89.07M,3,5,0,39.48,44.36,-95.05,7239.08,7745,Below cloud ( Bearish),Aug 21 2026,-24.21
+HydroPower Index,"3,737.48",3768.23,3715.16,"3,725.94",-25.04,-0.67,2.50B,27,83,1,50.05,50.97,31.13,3716,3804,above cloud ( Bullish),Aug 21 2026,9.94
+Investment Index,94.77,95.97,94.77,95.53,-0.18,-0.19,155.13M,3,3,1,37.38,42.69,-2.24,95.74,96.42,Below cloud ( Bearish),Aug 21 2026,-0.21
+Life Insurance,"11,634.13",11688.08,11560.97,"11,593.42",-43.22,-0.38,77.28M,3,10,1,27.25,33.05,-475,11597,12260,Below cloud ( Bearish),Aug 21 2026,-3.58
+Manufacturing And Processing,"10,391.77",10459.36,10335.74,"10,354.56",-47.91,-0.46,422.96M,2,12,2,42.73,40.91,-230,10220,11060,Below cloud ( Bearish),Aug 21 2026,134.56
+Microfinance Index,"4,503.79",4517.67,4478.37,"4,489.82",-21.68,-0.48,157.27m,16,33,1,29.17,36.25,-135,4506.98,4739,Below cloud ( Bearish),Aug 21 2026,-17.16
+Mutual Fund,20.61,20.71,20.59,20.71,0.01,0.05,12.37M,12,20,10,33.02,36.96,-0.64,20.79,21.36,Below cloud ( Bearish),Aug 21 2026,-0.08
+Non Life Insurance,"10,424.34",10459.55,10359.06,"10,419.14",-5.2,-0.05,47.26M,3,10,0,30.76,36.22,-389,11052,11069,Below cloud ( Bearish),Aug 21 2026,-632.86
+Others Index,"1,925.70",1925.82,1899.27,"1,903.76",-20.55,-1.07,75.55M,0,9,0,39.01,43.15,-44.57,1905,2034,Below cloud ( Bearish),Aug 21 2026,-1.24
+Trading Index,"3,275.58",3303.56,3197.84,"3,253.15",-22.43,-0.68,9.17M,0,2,0,40.66,44.64,-91.59,3262,3572,Below cloud ( Bearish),Aug 21 2026,-8.85
