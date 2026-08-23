@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Trade With Vibes — NEPSE Suite</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
+.shell{display:flex;flex-direction:column;height:100vh;}
+.topbar{display:flex;align-items:center;gap:0;background:#080c12;border-bottom:1px solid #1a2535;padding:0 8px;flex-shrink:0;}
+.brand{font-family:'Share Tech Mono',monospace;font-size:11px;color:#f5c518;letter-spacing:2px;padding:10px 14px 10px 4px;white-space:nowrap;}
+.tab-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:#6a8aaa;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab-btn:hover{color:#dce6f0;}
+.tab-btn.on{color:#f5c518;border-bottom-color:#f5c518;}
+.frames{flex:1;position:relative;overflow:hidden;}
+.frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#040B16;display:none;}
+.frames iframe.on{display:block;}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#0f1b2e;color:#f5c518;font-family:'Share Tech Mono',monospace;font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid #f5c51844;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;}
+.toast.show{opacity:1;}
 
+/* ===== Auth Gate ===== */
+#authGate{position:fixed;inset:0;background:#040B16;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+#authGate.hidden{display:none;}
+.gate-box{width:100%;max-width:360px;background:#0a1220;border:1px solid #1a2535;border-radius:10px;padding:28px 24px;box-shadow:0 0 40px rgba(245,197,24,0.06);}
+.gate-brand{font-family:'Share Tech Mono',monospace;font-size:13px;color:#f5c518;letter-spacing:2px;text-align:center;margin-bottom:4px;}
+.gate-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a7794;text-align:center;margin-bottom:22px;letter-spacing:1px;}
+.gate-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#8aa4bd;letter-spacing:1px;margin-bottom:6px;display:block;}
+.gate-input{width:100%;background:#0f1b2e;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:14px;padding:11px 12px;border-radius:6px;margin-bottom:14px;outline:none;transition:border-color .15s;}
+.gate-input:focus{border-color:#f5c51888;}
+.gate-btn{width:100%;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:12px;border:0;border-radius:6px;cursor:pointer;transition:opacity .15s;}
+.gate-btn:hover{opacity:.88;}
+.gate-btn:disabled{opacity:.4;cursor:not-allowed;}
+.gate-msg{font-family:'Share Tech Mono',monospace;font-size:10px;color:#e2574c;margin-top:10px;min-height:14px;text-align:center;}
+.gate-msg.ok{color:#4ce27a;}
+.gate-link{font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a7794;text-align:center;margin-top:16px;cursor:pointer;text-decoration:underline;}
+.gate-link:hover{color:#8aa4bd;}
+.gate-step{display:none;}
+.gate-step.on{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ===== Auth Gate ===== -->
+<div id="authGate">
+  <div class="gate-box">
+    <div class="gate-brand">&#9670; TRADE WITH VIBES</div>
+    <div class="gate-sub">EMAIL VERIFICATION REQUIRED</div>
+
+    <div class="gate-step on" id="gateStep1">
+      <label class="gate-label">YOUR EMAIL</label>
+      <input type="email" id="gateEmail" class="gate-input" placeholder="you@example.com" autocomplete="email">
+      <button class="gate-btn" id="gateSendBtn" onclick="twvSendCode()">SEND VERIFICATION CODE</button>
+      <div class="gate-msg" id="gateMsg1"></div>
+    </div>
+
+    <div class="gate-step" id="gateStep2">
+      <label class="gate-label">ENTER 6-DIGIT CODE SENT TO YOUR EMAIL</label>
+      <input type="text" id="gateCode" class="gate-input" placeholder="000000" maxlength="6" inputmode="numeric">
+      <button class="gate-btn" id="gateVerifyBtn" onclick="twvVerifyCode()">VERIFY & ENTER</button>
+      <div class="gate-msg" id="gateMsg2"></div>
+      <div class="gate-link" onclick="twvResendCode()">Resend code</div>
+      <div class="gate-link" onclick="twvBackToEmail()">Use a different email</div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">&#9670; TRADE WITH VIBES</div>
+    <div class="tab-btn on" data-tab="drilldown" onclick="goTab('drilldown')">&#9776; INDEX / SECTORS</div>
+    <div class="tab-btn" data-tab="screener" onclick="goTab('screener')">&#128269; SCREENER</div>
+    <div class="tab-btn" data-tab="qml" onclick="goTab('qml')">&#9889; QML SUITE</div>
+    <div class="tab-btn" data-tab="gann" onclick="goTab('gann')">&#9721; GANN CALC</div>
+  </div>
+  <div class="frames">
+    <iframe id="frame-drilldown" class="on" src="drilldown_page.html"></iframe>
+    <iframe id="frame-screener" src="screener_page.html"></iframe>
+    <iframe id="frame-qml" src="nepse_qml_v2.html"></iframe>
+    <iframe id="frame-gann" src="gann_hexagon_complete_mhl.html"></iframe>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+/* ================= EmailJS Auth Gate Config =================
+   Fill these in from your EmailJS dashboard (dashboard.emailjs.com):
+   1) EMAILJS_PUBLIC_KEY -> Account > General > Public Key
+   2) EMAILJS_SERVICE_ID -> already set to your existing service
+   3) EMAILJS_TEMPLATE_CODE -> a template that emails the CODE to the visitor.
+        Template vars used: {{to_email}}, {{code}}
+   4) EMAILJS_TEMPLATE_NOTIFY -> a template that emails YOU when someone new registers.
+        Template vars used: {{to_email}}, {{user_email}}, {{time}}
+        (set the template's "To email" field to pandeysukram@gmail.com, or
+         it will use the to_email value passed below)
+================================================================ */
+var EMAILJS_PUBLIC_KEY   = 'tbVFYRq86PWWMp0VR';
+var EMAILJS_SERVICE_ID   = 'service_o78njxh';
+var EMAILJS_TEMPLATE_CODE   = 'template_uz1ngrf';
+var EMAILJS_TEMPLATE_NOTIFY = ''; // not needed - the code template already Bcc's pandeysukram@gmail.com
+var OWNER_EMAIL = 'pandeysukram@gmail.com';
+var VERIFY_TTL_MS = 10*60*1000;      // code valid for 10 minutes
+var SESSION_TTL_DAYS = 30;           // stay logged in for 30 days on this device
+
+(function(){ if(window.emailjs) emailjs.init({publicKey: EMAILJS_PUBLIC_KEY}); })();
+
+function twvSetMsg(id,text,ok){
+  var el=document.getElementById(id);
+  el.textContent=text||'';
+  el.classList.toggle('ok',!!ok);
+}
+
+function twvValidEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function twvGenCode(){
+  return String(Math.floor(100000+Math.random()*900000));
+}
+
+function twvSendCode(){
+  var emailInput=document.getElementById('gateEmail');
+  var email=emailInput.value.trim().toLowerCase();
+  twvSetMsg('gateMsg1','');
+  if(!twvValidEmail(email)){
+    twvSetMsg('gateMsg1','Please enter a valid email address.');
+    return;
+  }
+  if(EMAILJS_PUBLIC_KEY==='YOUR_PUBLIC_KEY_HERE'||EMAILJS_TEMPLATE_CODE==='YOUR_CODE_TEMPLATE_ID_HERE'){
+    twvSetMsg('gateMsg1','Setup incomplete: EmailJS keys not configured yet.');
+    return;
+  }
+  var code=twvGenCode();
+  var payload={email:email,code:code,ts:Date.now()};
+  sessionStorage.setItem('twv_pending_verification',JSON.stringify(payload));
+
+  var btn=document.getElementById('gateSendBtn');
+  btn.disabled=true; btn.textContent='SENDING...';
+
+  emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_CODE,{
+      email:email,
+      passcode:code,
+      time:new Date(Date.now()+VERIFY_TTL_MS).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})
+    })
+    .then(function(){
+      // owner is auto-notified via the template's Bcc (pandeysukram@gmail.com) - no separate send needed
+      btn.disabled=false; btn.textContent='SEND VERIFICATION CODE';
+      document.getElementById('gateStep1').classList.remove('on');
+      document.getElementById('gateStep2').classList.add('on');
+      twvSetMsg('gateMsg2','Code sent to '+email,true);
+      document.getElementById('gateCode').focus();
+    })
+    .catch(function(err){
+      btn.disabled=false; btn.textContent='SEND VERIFICATION CODE';
+      var detail = (err && (err.text || err.message)) ? (err.text || err.message) : JSON.stringify(err);
+      twvSetMsg('gateMsg1','Error: '+detail);
+      console.error('EmailJS send error:',err);
+    });
+}
+
+function twvResendCode(){
+  document.getElementById('gateCode').value='';
+  twvSetMsg('gateMsg2','');
+  twvSendCode();
+}
+
+function twvBackToEmail(){
+  sessionStorage.removeItem('twv_pending_verification');
+  document.getElementById('gateStep2').classList.remove('on');
+  document.getElementById('gateStep1').classList.add('on');
+  twvSetMsg('gateMsg1','');
+  twvSetMsg('gateMsg2','');
+}
+
+function twvVerifyCode(){
+  var entered=document.getElementById('gateCode').value.trim();
+  var raw=sessionStorage.getItem('twv_pending_verification');
+  twvSetMsg('gateMsg2','');
+  if(!raw){
+    twvSetMsg('gateMsg2','Session expired. Please request a new code.');
+    return;
+  }
+  var pending=JSON.parse(raw);
+  if(Date.now()-pending.ts>VERIFY_TTL_MS){
+    twvSetMsg('gateMsg2','Code expired. Please request a new one.');
+    return;
+  }
+  if(entered!==pending.code){
+    twvSetMsg('gateMsg2','Incorrect code. Please try again.');
+    return;
+  }
+  var verified={email:pending.email,verifiedAt:Date.now()};
+  localStorage.setItem('twv_verified_user',JSON.stringify(verified));
+  sessionStorage.removeItem('twv_pending_verification');
+  twvSetMsg('gateMsg2','Verified! Loading dashboard...',true);
+  setTimeout(twvUnlockShell,500);
+}
+
+function twvUnlockShell(){
+  document.getElementById('authGate').classList.add('hidden');
+}
+
+function twvCheckExistingSession(){
+  var raw=localStorage.getItem('twv_verified_user');
+  if(!raw)return false;
+  try{
+    var v=JSON.parse(raw);
+    var ageDays=(Date.now()-v.verifiedAt)/(1000*60*60*24);
+    if(v.email && ageDays<SESSION_TTL_DAYS) return true;
+  }catch(e){}
+  localStorage.removeItem('twv_verified_user');
+  return false;
+}
+
+if(twvCheckExistingSession()){
+  document.getElementById('authGate').classList.add('hidden');
+}
+</script>
+<script>
+function goTab(name){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('on',b.dataset.tab===name);});
+  document.querySelectorAll('.frames iframe').forEach(function(f){f.classList.toggle('on',f.id==='frame-'+name);});
+  if(name==='drilldown'){
+    var ddFrame=document.getElementById('frame-drilldown');
+    if(ddFrame&&ddFrame.contentWindow)ddFrame.contentWindow.postMessage({type:'resyncFromQML'},'*');
+  }
+}
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window.__tt);
+  window.__tt=setTimeout(function(){t.classList.remove('show');},1600);
+}
+// Relay: any child frame (Screener / Drill-down) can ask to jump straight to a scrip in QML,
+// or just ask to switch tabs. Single click/tap only — no double-click/double-tap anywhere.
+window.addEventListener('message',function(e){
+  if(!e.data)return;
+  if(e.data.type==='gotoScrip'&&e.data.sym){
+    goTab('qml');
+    var qf=document.getElementById('frame-qml');
+    function relay(){
+      qf.contentWindow.postMessage({type:'gotoScrip',sym:e.data.sym},'*');
+    }
+    // if QML iframe already loaded, relay immediately; otherwise wait for load
+    if(qf.dataset.loaded==='1')relay();
+    else qf.addEventListener('load',function once(){qf.dataset.loaded='1';relay();qf.removeEventListener('load',once);});
+    showToast('\u2192 '+e.data.sym+' opened in QML');
+  }
+  if(e.data.type==='gotoTab'&&e.data.tab){
+    goTab(e.data.tab);
+  }
+});
+document.getElementById('frame-qml').addEventListener('load',function(){this.dataset.loaded='1';});
+</script>
+</body>
+</html>
