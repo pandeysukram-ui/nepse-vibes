@@ -83,108 +83,7 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-/* ================= Firebase Device/Trial Gate Config =================
-   1) Go to https://console.firebase.google.com -> Create project (free)
-   2) Build > Firestore Database > Create database (start in "test mode" for now)
-   3) Project settings (gear icon) > General > scroll to "Your apps" > Add app > Web (</>)
-   4) Copy the firebaseConfig object values into FIREBASE_CONFIG below
-   5) Set TRIAL_QR_LINK to whatever link you want the QR code to open
-      (e.g. your WhatsApp link, payment page, or contact form) after the
-      7-day trial ends.
-   IMPORTANT SECURITY NOTE: with no server, Firestore rules can't fully
-   verify "this browser really is that email" — a technically determined
-   person could still tamper with requests. This is a soft gate (keeps out
-   casual/curious visitors and enforces 1-device + 7-day trial for
-   everyone else); it is not bank-grade security. That's fine for your
-   stated goal (stop it looking open, track/limit access) without needing
-   a backend server to maintain.
-======================================================================== */
-var FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-var TRIAL_DAYS = 7;
-var TRIAL_QR_LINK = "https://wa.me/9779800000000"; // <-- change to your contact/payment link
-
-firebase.initializeApp(FIREBASE_CONFIG);
-var twvDb = firebase.firestore();
-
-function twvGetDeviceId(){
-  var id = localStorage.getItem('twv_device_id');
-  if(!id){
-    id = 'dev_' + Date.now() + '_' + Math.random().toString(36).slice(2,10);
-    localStorage.setItem('twv_device_id', id);
-  }
-  return id;
-}
-
-// Called after the 6-digit code is confirmed correct. Decides: new user,
-// same device returning, blocked (other device), or trial expired.
-function twvCheckAccessAndUnlock(email){
-  var deviceId = twvGetDeviceId();
-  var userRef = twvDb.collection('twv_users').doc(email);
-  userRef.get().then(function(doc){
-    if(!doc.exists){
-      userRef.set({
-        deviceId: deviceId,
-        firstAccessDate: firebase.firestore.FieldValue.serverTimestamp(),
-        isClient: false,
-        multiDeviceAllowed: false
-      }).then(function(){ twvFinalizeLogin(email, deviceId); })
-        .catch(function(err){ twvSetMsg('gateMsg2','Setup error: '+(err.message||err)); });
-      return;
-    }
-    var data = doc.data();
-    var deviceOk = (data.deviceId === deviceId) || (data.multiDeviceAllowed === true);
-    if(!deviceOk){
-      twvShowBlocked('This email is already registered on another device.<br>Contact us if you need multi-device access.');
-      return;
-    }
-    if(data.isClient === true){
-      twvFinalizeLogin(email, deviceId);
-      return;
-    }
-    var firstAccess = data.firstAccessDate ? data.firstAccessDate.toDate() : new Date();
-    var daysUsed = (Date.now() - firstAccess.getTime()) / (1000*60*60*24);
-    if(daysUsed > TRIAL_DAYS){
-      twvShowTrialExpired();
-      return;
-    }
-    twvFinalizeLogin(email, deviceId);
-  }).catch(function(err){
-    twvSetMsg('gateMsg2','Access check failed: '+(err.message||err));
-  });
-}
-
-function twvFinalizeLogin(email, deviceId){
-  var verified={email:email,verifiedAt:Date.now(),deviceId:deviceId};
-  localStorage.setItem('twv_verified_user',JSON.stringify(verified));
-  twvSetMsg('gateMsg2','Verified! Loading dashboard...',true);
-  setTimeout(twvUnlockShell,500);
-}
-
-function twvShowBlocked(msg){
-  var box=document.querySelector('.gate-box');
-  box.innerHTML='<div class="gate-brand">&#9670; ACCESS DENIED</div>'+
-    '<div class="gate-msg" style="margin-top:14px;">'+msg+'</div>';
-}
-
-function twvShowTrialExpired(){
-  var box=document.querySelector('.gate-box');
-  box.innerHTML='<div class="gate-brand">&#9670; TRIAL ENDED</div>'+
-    '<div class="gate-sub">Your '+TRIAL_DAYS+'-day free trial has expired</div>'+
-    '<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(TRIAL_QR_LINK)+'" style="display:block;margin:16px auto;border-radius:8px;">'+
-    '<div class="gate-msg" style="color:#8aa4bd;">Scan to contact us and continue access</div>';
-}
-</script>
 <script>
 /* ================= EmailJS Auth Gate Config =================
    Fill these in from your EmailJS dashboard (dashboard.emailjs.com):
@@ -292,9 +191,11 @@ function twvVerifyCode(){
     twvSetMsg('gateMsg2','Incorrect code. Please try again.');
     return;
   }
+  var verified={email:pending.email,verifiedAt:Date.now()};
+  localStorage.setItem('twv_verified_user',JSON.stringify(verified));
   sessionStorage.removeItem('twv_pending_verification');
-  twvSetMsg('gateMsg2','Checking access...',true);
-  twvCheckAccessAndUnlock(pending.email);
+  twvSetMsg('gateMsg2','Verified! Loading dashboard...',true);
+  setTimeout(twvUnlockShell,500);
 }
 
 function twvUnlockShell(){
