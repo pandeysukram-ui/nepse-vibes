@@ -563,7 +563,9 @@ function autoLoadScripData(silent){
     document.getElementById('swLow').value=(eodRow.low||eodRow.close).toFixed(2);
     document.getElementById('swHigh').value=(eodRow.high||eodRow.close).toFixed(2);
     document.getElementById('curP').value=eodRow.close.toFixed(2);
-    usedDate='latest EOD import';
+    let eodImportDate='';
+    try{eodImportDate=localStorage.getItem('twv_eod_date')||'';}catch(e){}
+    usedDate=eodImportDate?('EOD import, '+eodImportDate):'latest EOD import (date unknown)';
     found=true;
   }
 
