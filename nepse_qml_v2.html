@@ -3564,7 +3564,7 @@ function persistIndexHistory(){
 // device/browser shows the same "as of" date instead of relying only on this
 // device's own localStorage (which only updates when THIS device does a manual import).
 function fetchIndexFromBackend(){
-  var key = getBackendKey(false); // don't prompt on load; only import flow sets the key
+  var key = getBackendKey(true); // prompt once per device (only verified users reach this page) so every device auto-syncs, not just ones that already did a manual import
   if(!key) return;
   fetch('https://avinnapandey.com/Nepse-Backend/get_index_history.php?key='+encodeURIComponent(key))
     .then(function(r){ return r.json(); })
