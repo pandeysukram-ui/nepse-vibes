@@ -139,7 +139,6 @@
       <div id="qml-link-badge" style="display:none;font-size:8px;font-family:'Share Tech Mono',monospace;background:rgba(51,204,255,.1);color:#33ccff;border:1px solid rgba(51,204,255,.3);border-radius:10px;padding:3px 8px;">⚡ linked with QML</div>
     </div>
   </div>
-  <div id="dd-data-warning" style="display:none;margin-bottom:10px;padding:7px 10px;border-radius:6px;background:rgba(231,76,60,0.12);border:1px solid #e74c3c;color:#e74c3c;font-size:9px;font-family:'Share Tech Mono',monospace;"></div>
   <div class="strip-label">▸ NEPSE INDEX — 3 DAY TRACK</div>
   <div class="day-strip">
     <div class="day-card">
@@ -170,7 +169,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const NEPSE={close:2736.17,chg:0.09};
+const NEPSE={close:2736.17,chg:0.09,date:null};
 const SECTORS=[
   {name:'BANKING',     abbr:'BNK',
    d8:{close:1448.76,chg:-0.23}, d9:{close:1445.56,chg: 0.00}, d10:{close:1445.57,chg: 0.00}},
@@ -207,28 +206,6 @@ function getScreenerLive(){
     var raw=localStorage.getItem('twv_screener_live');
     return raw?JSON.parse(raw).data:null;
   }catch(e){return null;}
-}
-function checkDrilldownDataFreshness(){
-  var el=document.getElementById('dd-data-warning');
-  if(!el)return;
-  var raw=null;
-  try{raw=localStorage.getItem('twv_screener_live');}catch(e){}
-  if(!raw){
-    el.textContent='\u26a0 No live data loaded yet in this browser \u2014 showing baked/sample snapshot from publish time. Open Screener page first (or import today.csv there) to sync live prices here.';
-    el.style.display='block';
-    return;
-  }
-  var saved=null;
-  try{saved=JSON.parse(raw);}catch(e){}
-  if(!saved||!saved.date){el.style.display='none';return;}
-  var today=new Date();
-  var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  if(saved.date!==todayStr&&today.getHours()>=18){
-    el.textContent='\u26a0 Sector/scrip data is from '+saved.date+', not today ('+todayStr+'). Past 6 PM \u2014 re-import today.csv on the Screener page.';
-    el.style.display='block';
-  }else{
-    el.style.display='none';
-  }
 }
 function ensureSectorScrips(name){
   var af=SECTOR_AUTOFILL[name];
@@ -297,6 +274,24 @@ function extractPct(chgStr){
   var n=parseFloat(s.replace(/[^0-9.\-]/g,''));
   return isNaN(n)?0:n;
 }
+// NEPSE trading week is Sun-Thu; steps back over Fri/Sat to find the previous trading day
+function prevTradingDay(d){
+  var x=new Date(d);
+  do{ x.setDate(x.getDate()-1); }while(x.getDay()===5||x.getDay()===6);
+  return x;
+}
+function fmtShortDate(d){
+  if(!d||isNaN(d.getTime()))return '';
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+months[d.getMonth()];
+}
+function computeDayDates(todayStr){
+  var t=todayStr?new Date(/^\d{4}-\d{2}-\d{2}$/.test(todayStr)?todayStr+'T00:00:00':todayStr):null;
+  if(!t||isNaN(t.getTime())) return {d1:'',d2:'',today:''};
+  var day1=prevTradingDay(t), day2=prevTradingDay(day1);
+  return {d1:fmtShortDate(day2),d2:fmtShortDate(day1),today:fmtShortDate(t)};
+}
+var DAY_DATES={d1:'',d2:'',today:''};
 function syncFromQML(){
   try{
     var raw=localStorage.getItem('twv_scrip_states');
@@ -305,10 +300,12 @@ function syncFromQML(){
     var synced=0;
     if(all.NEPSE){
       NEPSE.close=all.NEPSE.close;
+      NEPSE.date=all.NEPSE.date||null;
       var chgNum=extractPct(all.NEPSE.chg);
       NEPSE.chg=chgNum;
       NEPSE_D.d10=chgNum;
       synced++;
+      DAY_DATES=computeDayDates(NEPSE.date);
     }
     SECTORS.forEach(function(sec){
       var qk=DD_TO_QML[sec.name];
@@ -336,9 +333,9 @@ function dayColor(chg){return chg>0?'#00ff99':chg<0?'#ff4444':'#778899';}
 function dayArrow(chg){return chg>0?'▲':chg<0?'▼':'─';}
 function buildSectorStrip(sec){
   const days=[
-    {label:'DAY 1', key:'d8', nepseChg:-0.73},
-    {label:'DAY 2', key:'d9', nepseChg:-0.05},
-    {label:'TODAY', key:'d10', nepseChg:0.09, today:true},
+    {label:'DAY 1', key:'d8', nepseChg:-0.73, date:DAY_DATES.d1},
+    {label:'DAY 2', key:'d9', nepseChg:-0.05, date:DAY_DATES.d2},
+    {label:'TODAY', key:'d10', nepseChg:0.09, today:true, date:DAY_DATES.today},
   ];
   const rs8=parseFloat((sec.d8.chg-(-0.73)).toFixed(2));
   const rs10=parseFloat((sec.d10.chg-0.09).toFixed(2));
@@ -357,6 +354,7 @@ function buildSectorStrip(sec){
         return `<div class="day-card ${d.today?'today':''}">
           <div class="dc-bar" style="width:100%;background:${col};"></div>
           <div class="dc-label">${d.label}${d.today?` <span style="color:#f5c518;font-size:8px;">◀ TODAY</span>`:''}</div>
+          <div class="dc-date" style="color:#5a7794;font-size:8px;letter-spacing:0.5px;margin-bottom:2px;">${d.date||'&mdash;'}</div>
           <div class="dc-val" style="color:${col};">${data.close.toLocaleString()}</div>
           <div class="dc-chg" style="color:${col};">${dayArrow(data.chg)} ${sign(data.chg)}${f2(data.chg)}%</div>
           <div class="dc-sub">
@@ -888,7 +886,6 @@ function updateHeaderNEPSE(){
 goL1();
 updateHeaderNEPSE();
 updateTodayCard();
-checkDrilldownDataFreshness();
 window.addEventListener('message',function(e){
   if(e.data&&e.data.type==='resyncFromQML'){
     ddSynced=syncFromQML();
