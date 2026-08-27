@@ -1624,6 +1624,7 @@ function autoSave(){
   try{
     localStorage.setItem('twv_state',JSON.stringify(state));
     localStorage.setItem('twv_levels',JSON.stringify(levels));
+    if(state&&state.ticker) saveScripState(state.ticker,state); // keep per-ticker store in sync too, so switching tickers never loses unsaved edits
     var now=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
     localStorage.setItem('twv_saved_date',now);
     var el=document.getElementById('hdr-saved');
@@ -3586,10 +3587,54 @@ function fetchIndexFromBackend(){
         });
       });
       persistIndexHistory();
+      mergeScripStatesFromBackend(res.latest);
       updateFreshnessBanner();
       renderDashboard();
     })
     .catch(function(){ /* offline/unreachable \u2014 local data still shown, fails silently */ });
+}
+// The freshness banner and dashboard tiles (Open/High/Low/Close/RSI/etc for whichever
+// ticker is selected) read from twv_scrip_states, NOT from indexHistory \u2014 that's a
+// separate localStorage bucket only written by manual EOD CSV import. Without this,
+// every sector/index (NONLIFEINSU, BANKING, ...) stays stuck on whatever date it was
+// last manually imported on, even after fetchIndexFromBackend() updates indexHistory.
+// This merges the backend's latest close/chg/pct/rsi/wma/dpo/seb into twv_scrip_states
+// for every index ticker \u2014 keeping Open/High/Low/Volume/levels/targets untouched
+// since the backend doesn't carry those \u2014 and refreshes the on-screen state if the
+// currently selected ticker was one of the ones updated.
+function mergeScripStatesFromBackend(latestRows){
+  try{
+    var raw = localStorage.getItem('twv_scrip_states');
+    var all = raw?JSON.parse(raw):{};
+    var touchedActive = false;
+    (latestRows||[]).forEach(function(row){
+      var ticker = normalizeTickerName(row.ticker||'');
+      if(!ticker || !presets[ticker]) return; // only known index/sector tickers
+      var newDate = row.trade_date;
+      var existing = all[ticker];
+      if(existing && existing.date && newDate && String(newDate)<=String(existing.date)) return; // not newer
+      var chgNum = parseFloat(row.chg)||0;
+      var pctNum = parseFloat(row.pct)||0;
+      var merged = existing ? JSON.parse(JSON.stringify(existing)) : JSON.parse(JSON.stringify(presets[ticker].state));
+      merged.date  = newDate;
+      merged.close = parseFloat(row.close)||merged.close;
+      merged.chg   = (chgNum>=0?'+':'')+chgNum.toFixed(2)+' ('+(pctNum>=0?'+':'')+pctNum.toFixed(2)+'%)';
+      if(row.rsi!==undefined) merged.rsi = parseFloat(row.rsi)||merged.rsi;
+      if(row.wma!==undefined) merged.wma = parseFloat(row.wma)||merged.wma;
+      if(row.dpo!==undefined) merged.dpo = parseFloat(row.dpo)||merged.dpo;
+      if(row.seb!==undefined) merged.seb = parseFloat(row.seb)||merged.seb;
+      all[ticker]=merged;
+      if(ticker===state.ticker) touchedActive=true;
+    });
+    localStorage.setItem('twv_scrip_states', JSON.stringify(all));
+    if(touchedActive){
+      var refreshed = all[state.ticker];
+      if(refreshed){
+        state = JSON.parse(JSON.stringify(refreshed));
+        populateEditorFields();
+      }
+    }
+  }catch(e){}
 }
 // Returns {prev, prevDate, trail:[...]} for the ticker, excluding today's own last entry
 function getIndexTrail(ticker){
