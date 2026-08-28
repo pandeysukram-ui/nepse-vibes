@@ -86,6 +86,86 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- ===== Demo Class mini-widget: floating button + small popup form ===== -->
+<style>
+#demoBtn{position:fixed;right:16px;bottom:16px;z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+#demoBtn:hover{opacity:.9;}
+#demoOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
+#demoOverlay.on{display:flex;}
+#demoBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #1a2535;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(245,197,24,0.08);position:relative;}
+#demoClose{position:absolute;top:8px;right:10px;background:none;border:0;color:#5a7794;font-size:16px;cursor:pointer;}
+#demoBox h3{font-size:13px;color:#fff;margin-bottom:4px;}
+#demoBox .dsub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:14px;}
+#demoBox label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#8aa4bd;letter-spacing:0.5px;margin-bottom:4px;display:block;}
+#demoBox input{width:100%;background:#0f1b2e;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:10px;outline:none;}
+#demoBox input:focus{border-color:#f5c51888;}
+#demoBtnSubmit{width:100%;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:11px;border:0;border-radius:6px;cursor:pointer;}
+#demoBtnSubmit:disabled{opacity:.4;cursor:not-allowed;}
+#demoMsg{font-family:'Share Tech Mono',monospace;font-size:9px;color:#e2574c;margin-top:8px;min-height:12px;text-align:center;}
+#demoStep2{display:none;}
+.demo-zoom-row{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.demo-zoom-row:last-child{border-bottom:0;}
+.demo-zoom-val{color:#fff;font-weight:700;}
+</style>
+
+<button id="demoBtn" onclick="demoOpen()">&#128197; DEMO CLASS</button>
+<div id="demoOverlay">
+  <div id="demoBox">
+    <button id="demoClose" onclick="demoClose()">&times;</button>
+
+    <div id="demoStep1">
+      <h3>QML v2 Demo Class</h3>
+      <div class="dsub">Register to get the Zoom details.</div>
+      <form onsubmit="return demoSubmit(event)">
+        <label>Full Name *</label>
+        <input type="text" id="demo-name" required>
+        <label>Email *</label>
+        <input type="email" id="demo-email" required>
+        <button type="submit" id="demoBtnSubmit">REGISTER</button>
+        <div id="demoMsg"></div>
+      </form>
+    </div>
+
+    <div id="demoStep2">
+      <h3>You're registered! &#127881;</h3>
+      <div class="dsub">Save these details for the class:</div>
+      <div class="demo-zoom-row"><span>Meeting ID</span><span class="demo-zoom-val" id="demoZoomId">000 0000 0000</span></div>
+      <div class="demo-zoom-row"><span>Password</span><span class="demo-zoom-val" id="demoZoomPass">TWV2026</span></div>
+      <div class="demo-zoom-row"><span>Time</span><span class="demo-zoom-val" id="demoZoomTime">TBA</span></div>
+      <a href="#" id="demoJoinLink" target="_blank" style="display:block;text-align:center;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;padding:11px;border-radius:6px;text-decoration:none;margin-top:12px;">JOIN ON ZOOM</a>
+    </div>
+  </div>
+</div>
+<script>
+// ===== fill these in with the real class details =====
+var DEMO_ZOOM_ID='000 0000 0000', DEMO_ZOOM_PASS='TWV2026', DEMO_ZOOM_TIME='TBA', DEMO_ZOOM_URL='https://zoom.us/j/0000000000?pwd=xxxxxxxx';
+
+function demoOpen(){document.getElementById('demoOverlay').classList.add('on');}
+function demoClose(){document.getElementById('demoOverlay').classList.remove('on');}
+function demoValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+function demoSubmit(e){
+  e.preventDefault();
+  var name=document.getElementById('demo-name').value.trim();
+  var email=document.getElementById('demo-email').value.trim().toLowerCase();
+  var msg=document.getElementById('demoMsg');
+  if(!name||!email){msg.textContent='Please fill all required fields.';return false;}
+  if(!demoValidEmail(email)){msg.textContent='Please enter a valid email address.';return false;}
+  try{
+    var regs=JSON.parse(localStorage.getItem('twv_demo_registrations')||'[]');
+    regs.push({name:name,email:email,ts:new Date().toISOString()});
+    localStorage.setItem('twv_demo_registrations',JSON.stringify(regs));
+  }catch(err){}
+  document.getElementById('demoZoomId').textContent=DEMO_ZOOM_ID;
+  document.getElementById('demoZoomPass').textContent=DEMO_ZOOM_PASS;
+  document.getElementById('demoZoomTime').textContent=DEMO_ZOOM_TIME;
+  document.getElementById('demoJoinLink').href=DEMO_ZOOM_URL;
+  document.getElementById('demoStep1').style.display='none';
+  document.getElementById('demoStep2').style.display='block';
+  return false;
+}
+</script>
+<!-- ===== end Demo Class widget ===== -->
+
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 /* ================= EmailJS Auth Gate Config =================
