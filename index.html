@@ -138,16 +138,33 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 </div>
 <script>
 // ===== fill these in with the real class details =====
-var DEMO_ZOOM_ID='000 0000 0000', DEMO_ZOOM_PASS='TWV2026', DEMO_ZOOM_TIME='TBA', DEMO_ZOOM_URL='https://zoom.us/j/0000000000?pwd=xxxxxxxx';
+var DEMO_ZOOM_ID='000 0000 0000', DEMO_ZOOM_PASS='TWV2026', DEMO_ZOOM_TIME='Every Saturday — Section 1, 10-min break, Section 2', DEMO_ZOOM_URL='https://zoom.us/j/0000000000?pwd=xxxxxxxx';
+// EmailJS — reuse the same account as the site's email-gate (dashboard.emailjs.com).
+// Create ONE MORE template there (e.g. "template_demo_zoom") that emails {{to_email}} using
+// {{name}}, {{zoom_id}}, {{zoom_pass}}, {{zoom_time}}, {{zoom_url}} — then fill the two lines below.
+var DEMO_EMAILJS_PUBLIC_KEY  = 'tbVFYRq86PWWMp0VR'; // same public key as the main site
+var DEMO_EMAILJS_SERVICE_ID  = 'service_o78njxh';   // same service as the main site
+var DEMO_EMAILJS_TEMPLATE_ID = '';                  // <-- fill with the new template's ID
+
+(function(){ if(window.emailjs && DEMO_EMAILJS_PUBLIC_KEY) emailjs.init({publicKey: DEMO_EMAILJS_PUBLIC_KEY}); })();
 
 function demoOpen(){document.getElementById('demoOverlay').classList.add('on');}
 function demoClose(){document.getElementById('demoOverlay').classList.remove('on');}
 function demoValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+function demoReveal(){
+  document.getElementById('demoZoomId').textContent=DEMO_ZOOM_ID;
+  document.getElementById('demoZoomPass').textContent=DEMO_ZOOM_PASS;
+  document.getElementById('demoZoomTime').textContent=DEMO_ZOOM_TIME;
+  document.getElementById('demoJoinLink').href=DEMO_ZOOM_URL;
+  document.getElementById('demoStep1').style.display='none';
+  document.getElementById('demoStep2').style.display='block';
+}
 function demoSubmit(e){
   e.preventDefault();
   var name=document.getElementById('demo-name').value.trim();
   var email=document.getElementById('demo-email').value.trim().toLowerCase();
   var msg=document.getElementById('demoMsg');
+  var btn=document.getElementById('demoBtnSubmit');
   if(!name||!email){msg.textContent='Please fill all required fields.';return false;}
   if(!demoValidEmail(email)){msg.textContent='Please enter a valid email address.';return false;}
   try{
@@ -155,12 +172,18 @@ function demoSubmit(e){
     regs.push({name:name,email:email,ts:new Date().toISOString()});
     localStorage.setItem('twv_demo_registrations',JSON.stringify(regs));
   }catch(err){}
-  document.getElementById('demoZoomId').textContent=DEMO_ZOOM_ID;
-  document.getElementById('demoZoomPass').textContent=DEMO_ZOOM_PASS;
-  document.getElementById('demoZoomTime').textContent=DEMO_ZOOM_TIME;
-  document.getElementById('demoJoinLink').href=DEMO_ZOOM_URL;
-  document.getElementById('demoStep1').style.display='none';
-  document.getElementById('demoStep2').style.display='block';
+
+  if(window.emailjs && DEMO_EMAILJS_PUBLIC_KEY && DEMO_EMAILJS_TEMPLATE_ID){
+    btn.disabled=true; btn.textContent='REGISTERING...';
+    emailjs.send(DEMO_EMAILJS_SERVICE_ID,DEMO_EMAILJS_TEMPLATE_ID,{
+        to_email:email, name:name,
+        zoom_id:DEMO_ZOOM_ID, zoom_pass:DEMO_ZOOM_PASS, zoom_time:DEMO_ZOOM_TIME, zoom_url:DEMO_ZOOM_URL
+      })
+      .then(function(){ btn.disabled=false; btn.textContent='REGISTER'; demoReveal(); })
+      .catch(function(){ btn.disabled=false; btn.textContent='REGISTER'; msg.textContent='Email failed to send, but here are your details anyway:'; demoReveal(); });
+  } else {
+    demoReveal(); // no email template configured yet -- just show details on screen
+  }
   return false;
 }
 </script>
