@@ -341,6 +341,10 @@ function autoFetchScreenerCSV(){
       if(!isNaN(vol))s.vol=vol;
       if(!isNaN(hi52)&&hi52>0)s.hi52=hi52;
       if(!isNaN(lo52)&&lo52>0)s.lo52=lo52;
+      // Feed's own 52W high/low fields can lag behind the actual print (e.g. new low
+      // hasn't propagated to that column yet) — never let LTP sit outside the range we show.
+      if(s.hi52<ltp)s.hi52=ltp;
+      if(s.lo52>ltp)s.lo52=ltp;
       if(!isNaN(open))s.open=open;
       count++;
     });
@@ -457,6 +461,9 @@ function importScreenerCSV(file){
         if(!isNaN(vol))s.vol=vol;
         if(!isNaN(hi52)&&hi52>0)s.hi52=hi52;
         if(!isNaN(lo52)&&lo52>0)s.lo52=lo52;
+        // Same self-correction as the auto-fetch path — LTP can never be outside the shown range.
+        if(s.hi52<ltp)s.hi52=ltp;
+        if(s.lo52>ltp)s.lo52=ltp;
         count++;
       });
       if(count>0){
