@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
-.shell{display:flex;flex-direction:column;height:100vh;}
+.shell{display:flex;flex-direction:column;height:100vh;height:100dvh;padding-bottom:calc(34px + env(safe-area-inset-bottom));}
 .topbar{display:flex;align-items:center;gap:0;background:#080c12;border-bottom:1px solid #1a2535;padding:0 8px;flex-shrink:0;}
 .brand{font-family:'Share Tech Mono',monospace;font-size:11px;color:#f5c518;letter-spacing:2px;padding:10px 14px 10px 4px;white-space:nowrap;}
 .tab-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:#6a8aaa;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
@@ -80,16 +80,54 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
     <iframe id="frame-qml" src="nepse_qml_v2.html"></iframe>
     <iframe id="frame-gann" src="gann_hexagon_complete_mhl.html"></iframe>
   </div>
-</div>
-<div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;text-align:center;padding:8px 10px;background:#080c12;border-top:1px solid #1a2535;flex-shrink:0;">
-  &#9888; For educational purposes only. Not investment advice. Trading involves risk of loss &mdash; please do your own research and consult a licensed financial advisor. Trade With Vibes and its creator are not liable for any financial loss arising from use of this tool.
+  <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;text-align:center;padding:8px 10px;background:#080c12;border-top:1px solid #1a2535;flex-shrink:0;">
+    &#9888; For educational purposes only. Not investment advice. Trading involves risk of loss &mdash; please do your own research and consult a licensed financial advisor. Trade With Vibes and its creator are not liable for any financial loss arising from use of this tool.
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <!-- ===== Demo Class mini-widget: floating button + small popup form ===== -->
 <style>
-#demoBtn{position:fixed;right:16px;bottom:16px;z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+#demoBtn{position:fixed;right:16px;bottom:calc(50px + env(safe-area-inset-bottom));z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
 #demoBtn:hover{opacity:.9;}
+#rateBtn{position:fixed;right:16px;bottom:calc(94px + env(safe-area-inset-bottom));z-index:60;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+#rateBtn:hover{opacity:.9;}
+#rateOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
+#rateOverlay.on{display:flex;}
+#rateBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #1a2535;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(0,180,255,0.08);position:relative;}
+#rateClose{position:absolute;top:8px;right:10px;background:none;border:0;color:#5a7794;font-size:16px;cursor:pointer;}
+#rateBox h3{font-size:13px;color:#fff;margin-bottom:4px;font-family:'Chakra Petch',sans-serif;}
+#rateBox .rsub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:14px;}
+.rate-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.rate-tab{flex:1;background:#0f1b2e;border:1px solid #1a2535;color:#8aa4bd;font-family:'Share Tech Mono',monospace;font-size:9px;padding:8px 4px;border-radius:6px;cursor:pointer;text-align:center;}
+.rate-tab.on{background:#00b4ff22;border-color:#00b4ff;color:#00b4ff;}
+.rate-panel{display:none;}
+.rate-panel.on{display:block;}
+.rate-price{font-size:24px;color:#fff;font-weight:700;font-family:'Chakra Petch',sans-serif;text-align:center;margin:10px 0 2px;}
+.rate-unit{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;text-align:center;margin-bottom:12px;}
+.rate-note{font-family:'Share Tech Mono',monospace;font-size:9px;color:#8aa4bd;text-align:center;line-height:1.6;}
+/* ===== 15-Day Package — eye-catching card ===== */
+.pkg15-card{border:1px solid #f5c51855;border-radius:10px;padding:14px;background:linear-gradient(180deg,#0f1b2e 0%,#0a1220 100%);box-shadow:0 0 24px rgba(245,197,24,0.10),inset 0 0 0 1px rgba(245,197,24,0.04);position:relative;overflow:hidden;}
+.pkg15-card::before{content:'';position:absolute;top:-40%;left:-10%;width:120%;height:80%;background:radial-gradient(ellipse at top,rgba(245,197,24,0.10),transparent 65%);pointer-events:none;}
+.pkg15-badge-row{display:flex;justify-content:center;margin-bottom:8px;}
+.pkg15-badge{background:linear-gradient(90deg,#4ce27a,#2fbf6a);color:#04150c;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;box-shadow:0 2px 10px rgba(76,226,122,0.35);}
+.pkg15-priceRow{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:6px 0 2px;}
+.pkg15-priceMain{font-size:26px;color:#fff;font-weight:700;font-family:'Chakra Petch',sans-serif;}
+.pkg15-priceSub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;}
+.pkg15-breakdown{text-align:center;font-family:'Share Tech Mono',monospace;font-size:8.5px;color:#6a8aaa;margin-bottom:10px;}
+.pkg15-divider{border:0;border-top:1px dashed #1a2535;margin:10px 0;}
+.pkg15-subhead{font-family:'Share Tech Mono',monospace;font-size:9px;color:#f5c518;letter-spacing:1px;margin-bottom:6px;text-align:center;}
+.pkg15-curriculum{max-height:118px;overflow-y:auto;margin-bottom:10px;padding-right:2px;}
+.pkg15-curriculum::-webkit-scrollbar{width:4px;}
+.pkg15-curriculum::-webkit-scrollbar-thumb{background:#f5c51855;border-radius:4px;}
+.pkg15-row{display:flex;align-items:center;gap:8px;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.pkg15-row:last-child{border-bottom:0;}
+.pkg15-daybadge{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:#f5c51818;border:1px solid #f5c51844;color:#f5c518;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.pkg15-rowlabel{font-family:'Chakra Petch',sans-serif;font-size:11px;color:#dce6f0;}
+.pkg15-tiers{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.pkg15-tier{background:#0f1b2e;border:1px solid #1a2535;border-radius:6px;padding:7px 4px;text-align:center;}
+.pkg15-tier .t-len{font-family:'Share Tech Mono',monospace;font-size:8px;color:#5a7794;letter-spacing:0.5px;}
+.pkg15-tier .t-price{font-family:'Chakra Petch',sans-serif;font-size:13px;color:#fff;font-weight:700;margin-top:2px;}
 #demoOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
 #demoOverlay.on{display:flex;}
 #demoBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #1a2535;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(245,197,24,0.08);position:relative;}
@@ -109,6 +147,118 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 </style>
 
 <button id="demoBtn" onclick="demoOpen()">&#128197; DEMO CLASS</button>
+<!-- ===== Rolling "Paid Class" ticker banner ===== -->
+<style>
+#paidTicker{position:fixed;left:0;right:0;bottom:0;z-index:65;background:#ff2d55;color:#fff;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.5px;padding:7px 0;padding-bottom:calc(7px + env(safe-area-inset-bottom));overflow:hidden;cursor:pointer;white-space:nowrap;}
+#paidTicker .ticker-track{display:inline-block;padding-left:100%;animation:paidScroll 18s linear infinite;}
+#paidTicker:hover .ticker-track{animation-play-state:paused;}
+@keyframes paidScroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
+</style>
+<div id="paidTicker" onclick="window.open('https://www.tiktok.com/@rajjjyinwy4/playlist/Information-7643681830176164625?is_from_webapp=1&sender_device=pc','_blank')">
+  <span class="ticker-track">&#127916;&nbsp; PAID CLASS &mdash; tap here for full class playlist on TikTok &nbsp;&#8226;&nbsp; &#127916;&nbsp; PAID CLASS &mdash; tap here for full class playlist on TikTok &nbsp;&#8226;&nbsp;</span>
+</div>
+<button id="rateBtn" onclick="rateOpen()" style="display:none;">&#128176; PRICING</button>
+<div id="rateOverlay">
+  <div id="rateBox">
+    <button id="rateClose" onclick="rateClose()">&times;</button>
+    <h3>QML Suite &mdash; Pricing</h3>
+    <div class="rsub">Select the plan that fits you.</div>
+    <div class="rate-tabs">
+      <div class="rate-tab on" data-plan="single" onclick="rateShow('single')">SINGLE</div>
+      <div class="rate-tab" data-plan="multiple" onclick="rateShow('multiple')">5&ndash;8 USERS</div>
+      <div class="rate-tab" data-plan="group" onclick="rateShow('group')">99+ USERS</div>
+      <div class="rate-tab" data-plan="package15" onclick="rateShow('package15')">15-DAY</div>
+    </div>
+    <div class="rate-panel on" data-plan="single">
+      <div class="rate-price">Rs 500<span style="font-size:12px;color:#5a7794;">/mo</span></div>
+      <div class="rate-unit">Single user &middot; billed monthly</div>
+      <div class="pkg15-tiers" style="margin-top:12px;">
+        <div class="pkg15-tier"><div class="t-len">1 MONTH</div><div class="t-price">Rs 500</div></div>
+        <div class="pkg15-tier"><div class="t-len">3 MONTHS</div><div class="t-price">Rs 1,300</div></div>
+        <div class="pkg15-tier"><div class="t-len">6 MONTHS</div><div class="t-price">Rs 2,500</div></div>
+        <div class="pkg15-tier"><div class="t-len">1 YEAR</div><div class="t-price">Rs 4,800</div></div>
+      </div>
+    </div>
+    <div class="rate-panel" data-plan="multiple">
+      <div class="rate-price">Rs 25,000</div>
+      <div class="rate-unit">5&ndash;8 users &middot; billed yearly, flat</div>
+      <div class="rate-note">One payment covers the whole group for the year.</div>
+    </div>
+    <div class="rate-panel" data-plan="group">
+      <div class="rate-price">Rs 1,35,000</div>
+      <div class="rate-unit">99+ users &middot; billed yearly, flat</div>
+      <div class="rate-note">Institutional / bulk rate for large groups.</div>
+    </div>
+    <div class="rate-panel" data-plan="package15">
+      <div id="pkg15-pending" style="text-align:center;padding:10px 0;">
+        <div class="rate-note" style="color:#f5c518;">Class day not fixed yet &mdash; payment opens once the schedule is confirmed. Check back soon.</div>
+      </div>
+      <div id="pkg15-active" style="display:none;">
+        <div class="pkg15-card">
+          <div class="pkg15-badge-row"><span class="pkg15-badge">&#127873; +1 MONTH QML SUITE FREE</span></div>
+          <div class="pkg15-priceRow"><span class="pkg15-priceMain">Rs 10,000</span><span class="pkg15-priceSub">course</span></div>
+          <div class="pkg15-breakdown">+ Rs 5,000 system fee &middot; Rs 15,000 total, one-time</div>
+          <hr class="pkg15-divider">
+          <div class="pkg15-subhead">15-DAY CURRICULUM</div>
+          <div class="pkg15-curriculum">
+            <div class="pkg15-row"><span class="pkg15-daybadge">4</span><span class="pkg15-rowlabel">Candlesticks</span></div>
+            <div class="pkg15-row"><span class="pkg15-daybadge">3</span><span class="pkg15-rowlabel">Patterns</span></div>
+            <div class="pkg15-row"><span class="pkg15-daybadge">4</span><span class="pkg15-rowlabel">Indicators</span></div>
+            <div class="pkg15-row"><span class="pkg15-daybadge">2</span><span class="pkg15-rowlabel">Strategies</span></div>
+            <div class="pkg15-row"><span class="pkg15-daybadge">2</span><span class="pkg15-rowlabel">Application &amp; Practical Use</span></div>
+          </div>
+          <hr class="pkg15-divider">
+          <div class="pkg15-subhead">THEN CONTINUE ON QML SUITE</div>
+          <div class="pkg15-tiers">
+            <div class="pkg15-tier"><div class="t-len">1 MONTH</div><div class="t-price">Rs 500</div></div>
+            <div class="pkg15-tier"><div class="t-len">3 MONTHS</div><div class="t-price">Rs 1,300</div></div>
+            <div class="pkg15-tier"><div class="t-len">6 MONTHS</div><div class="t-price">Rs 2,500</div></div>
+            <div class="pkg15-tier"><div class="t-len">1 YEAR</div><div class="t-price">Rs 4,800</div></div>
+          </div>
+          <div id="pkg15-qr" style="text-align:center;margin:6px 0;"></div>
+          <a href="#" id="pkg15-datalink" target="_blank" style="display:block;text-align:center;background:#4ce27a;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;padding:11px;border-radius:6px;text-decoration:none;">SUBMIT PAYMENT DETAILS</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function rateOpen(){document.getElementById('rateOverlay').classList.add('on');}
+function rateClose(){document.getElementById('rateOverlay').classList.remove('on');}
+function rateShow(plan){
+  document.querySelectorAll('.rate-tab').forEach(function(t){t.classList.toggle('on',t.dataset.plan===plan);});
+  document.querySelectorAll('.rate-panel').forEach(function(p){p.classList.toggle('on',p.dataset.plan===plan);});
+}
+// ===== 15-Day Package: stays "pending" until the class day is fixed. =====
+// Once you have the Zoom date, QR image, and data-collection form link, set
+// PKG15_ACTIVE = true and fill the two URLs below \u2014 the payment panel then
+// switches on automatically (still only reachable via the PRICING button click).
+var PKG15_ACTIVE = false;
+var PKG15_QR_IMAGE_URL = ''; // e.g. a hosted image of the eSewa QR
+var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transaction ID after payment
+(function(){
+  if(PKG15_ACTIVE){
+    document.getElementById('pkg15-pending').style.display='none';
+    var act=document.getElementById('pkg15-active');
+    act.style.display='block';
+    if(PKG15_QR_IMAGE_URL) document.getElementById('pkg15-qr').innerHTML='<img src="'+PKG15_QR_IMAGE_URL+'" style="max-width:160px;border-radius:8px;">';
+    if(PKG15_DATALINK_URL) document.getElementById('pkg15-datalink').href=PKG15_DATALINK_URL;
+  }
+})();
+// Reveal the Pricing button only after this browser has visited 8-9 times \u2014
+// before that, only the free "Paid Class" (TikTok) notice link is visible.
+(function(){
+  var REVEAL_AFTER_VISIT = 8; // becomes visible starting the 8th visit
+  try{
+    var n = parseInt(localStorage.getItem('twv_visit_count')||'0',10) + 1;
+    localStorage.setItem('twv_visit_count', String(n));
+    if(n >= REVEAL_AFTER_VISIT){
+      var btn = document.getElementById('rateBtn');
+      if(btn) btn.style.display = 'block';
+    }
+  }catch(e){}
+})();
+</script>
 <div id="demoOverlay">
   <div id="demoBox">
     <button id="demoClose" onclick="demoClose()">&times;</button>
@@ -121,6 +271,8 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
         <input type="text" id="demo-name" required>
         <label>Email *</label>
         <input type="email" id="demo-email" required>
+        <label>Nominee / Registering for <span style="color:#5a7794;">(optional)</span></label>
+        <input type="text" id="demo-nominee" placeholder="Leave blank if registering for yourself">
         <button type="submit" id="demoBtnSubmit">REGISTER</button>
         <div id="demoMsg"></div>
       </form>
@@ -151,6 +303,30 @@ var DEMO_EMAILJS_TEMPLATE_ID = '';                  // <-- fill with the new tem
 function demoOpen(){document.getElementById('demoOverlay').classList.add('on');}
 function demoClose(){document.getElementById('demoOverlay').classList.remove('on');}
 function demoValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+// Exports everyone who registered on THIS browser/device via the Demo Class form,
+// as a real Excel (.xlsx) file. Since registrations are stored per-browser
+// (no shared backend yet), this only captures signups made from this specific device.
+function exportRegistrationsCSV(){
+  var regs=[];
+  try{ regs=JSON.parse(localStorage.getItem('twv_demo_registrations')||'[]'); }catch(e){}
+  if(!regs.length){ alert('No registrations recorded on this device yet.'); return; }
+  if(!window.XLSX){ alert('Excel export library failed to load — check your internet connection and try again.'); return; }
+  var rows=[['Name','Email','Nominee','Registered At']];
+  regs.forEach(function(r){ rows.push([r.name||'',r.email||'',r.nominee||'',r.ts||'']); });
+  var ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:22},{wch:28},{wch:22},{wch:22}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Registrations');
+  XLSX.writeFile(wb,'demo_class_registrations_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+// Hidden admin-only trigger: no visible button anywhere (clients can never see or
+// click it). Only works if you add ?export=1 to the site URL yourself.
+(function(){
+  try{
+    var params=new URLSearchParams(window.location.search);
+    if(params.get('export')==='1') exportRegistrationsCSV();
+  }catch(e){}
+})();
 function demoReveal(){
   document.getElementById('demoZoomId').textContent=DEMO_ZOOM_ID;
   document.getElementById('demoZoomPass').textContent=DEMO_ZOOM_PASS;
@@ -163,13 +339,14 @@ function demoSubmit(e){
   e.preventDefault();
   var name=document.getElementById('demo-name').value.trim();
   var email=document.getElementById('demo-email').value.trim().toLowerCase();
+  var nominee=document.getElementById('demo-nominee').value.trim();
   var msg=document.getElementById('demoMsg');
   var btn=document.getElementById('demoBtnSubmit');
   if(!name||!email){msg.textContent='Please fill all required fields.';return false;}
   if(!demoValidEmail(email)){msg.textContent='Please enter a valid email address.';return false;}
   try{
     var regs=JSON.parse(localStorage.getItem('twv_demo_registrations')||'[]');
-    regs.push({name:name,email:email,ts:new Date().toISOString()});
+    regs.push({name:name,email:email,nominee:nominee,ts:new Date().toISOString()});
     localStorage.setItem('twv_demo_registrations',JSON.stringify(regs));
   }catch(err){}
 
@@ -190,6 +367,7 @@ function demoSubmit(e){
 <!-- ===== end Demo Class widget ===== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 /* ================= EmailJS Auth Gate Config =================
    Fill these in from your EmailJS dashboard (dashboard.emailjs.com):
