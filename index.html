@@ -78,7 +78,7 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
     <iframe id="frame-drilldown" class="on" src="drilldown_page.html"></iframe>
     <iframe id="frame-screener" src="screener_page.html"></iframe>
     <iframe id="frame-qml" src="nepse_qml_v2.html"></iframe>
-    <iframe id="frame-gann" src="gann_hexagon_complete_mhl.html"></iframe>
+    <iframe id="frame-gann" src="gann_hexagon_input_dashboard.html"></iframe>
   </div>
   <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;text-align:center;padding:8px 10px;background:#080c12;border-top:1px solid #1a2535;flex-shrink:0;">
     &#9888; For educational purposes only. Not investment advice. Trading involves risk of loss &mdash; please do your own research and consult a licensed financial advisor. Trade With Vibes and its creator are not liable for any financial loss arising from use of this tool.
@@ -88,9 +88,9 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 
 <!-- ===== Demo Class mini-widget: floating button + small popup form ===== -->
 <style>
-#demoBtn{position:fixed;right:16px;bottom:calc(50px + env(safe-area-inset-bottom));z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+#demoBtn{position:fixed;right:16px;bottom:calc(50px + env(safe-area-inset-bottom));z-index:60;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
 #demoBtn:hover{opacity:.9;}
-#rateBtn{position:fixed;right:16px;bottom:calc(94px + env(safe-area-inset-bottom));z-index:60;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+#rateBtn{position:fixed;right:16px;bottom:calc(94px + env(safe-area-inset-bottom));z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
 #rateBtn:hover{opacity:.9;}
 #rateOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
 #rateOverlay.on{display:flex;}
@@ -109,7 +109,8 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 /* ===== 15-Day Package — eye-catching card ===== */
 .pkg15-card{border:1px solid #f5c51855;border-radius:10px;padding:14px;background:linear-gradient(180deg,#0f1b2e 0%,#0a1220 100%);box-shadow:0 0 24px rgba(245,197,24,0.10),inset 0 0 0 1px rgba(245,197,24,0.04);position:relative;overflow:hidden;}
 .pkg15-card::before{content:'';position:absolute;top:-40%;left:-10%;width:120%;height:80%;background:radial-gradient(ellipse at top,rgba(245,197,24,0.10),transparent 65%);pointer-events:none;}
-.pkg15-badge-row{display:flex;justify-content:center;margin-bottom:8px;}
+.pkg15-badge-row{display:flex;justify-content:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.pkg15-zoomtag{background:#00b4ff18;border:1px solid #00b4ff55;color:#00b4ff;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.5px;padding:5px 10px;border-radius:999px;}
 .pkg15-badge{background:linear-gradient(90deg,#4ce27a,#2fbf6a);color:#04150c;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;box-shadow:0 2px 10px rgba(76,226,122,0.35);}
 .pkg15-priceRow{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:6px 0 2px;}
 .pkg15-priceMain{font-size:26px;color:#fff;font-weight:700;font-family:'Chakra Petch',sans-serif;}
@@ -130,7 +131,14 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 .pkg15-tier .t-price{font-family:'Chakra Petch',sans-serif;font-size:13px;color:#fff;font-weight:700;margin-top:2px;}
 #demoOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
 #demoOverlay.on{display:flex;}
-#demoBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #1a2535;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(245,197,24,0.08);position:relative;}
+#demoBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #00b4ff44;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(0,180,255,0.10);position:relative;}
+#demoBox h3{font-size:13px;color:#fff;margin-bottom:4px;}
+#demoBox .dsub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:14px;}
+#demoBox label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#8aa4bd;letter-spacing:0.5px;margin-bottom:4px;display:block;}
+#demoBox input{width:100%;background:#0f1b2e;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:10px;outline:none;}
+#demoBox input:focus{border-color:#00b4ff88;}
+#demoBtnSubmit{width:100%;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:11px;border:0;border-radius:6px;cursor:pointer;}
+#demoBtnSubmit:disabled{opacity:.4;cursor:not-allowed;}
 #demoClose{position:absolute;top:8px;right:10px;background:none;border:0;color:#5a7794;font-size:16px;cursor:pointer;}
 #demoBox h3{font-size:13px;color:#fff;margin-bottom:4px;}
 #demoBox .dsub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:14px;}
@@ -195,7 +203,7 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
       </div>
       <div id="pkg15-active" style="display:none;">
         <div class="pkg15-card">
-          <div class="pkg15-badge-row"><span class="pkg15-badge">&#127873; +1 MONTH QML SUITE FREE</span></div>
+          <div class="pkg15-badge-row"><span class="pkg15-badge">&#127873; +1 MONTH QML SUITE FREE</span><span class="pkg15-zoomtag">&#128249; LIVE ON ZOOM</span></div>
           <div class="pkg15-priceRow"><span class="pkg15-priceMain">Rs 10,000</span><span class="pkg15-priceSub">course</span></div>
           <div class="pkg15-breakdown">+ Rs 5,000 system fee &middot; Rs 15,000 total, one-time</div>
           <hr class="pkg15-divider">
@@ -251,7 +259,7 @@ var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transac
   var REVEAL_AFTER_VISIT = 8; // becomes visible starting the 8th visit
   try{
     var n = parseInt(localStorage.getItem('twv_visit_count')||'0',10) + 1;
-    localStorage.setItem('twv_visit_count', '8');
+    localStorage.setItem('twv_visit_count', String(n));
     if(n >= REVEAL_AFTER_VISIT){
       var btn = document.getElementById('rateBtn');
       if(btn) btn.style.display = 'block';
@@ -265,7 +273,7 @@ var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transac
 
     <div id="demoStep1">
       <h3>QML v2 Demo Class</h3>
-      <div class="dsub">Register to get the Zoom details.</div>
+      <div class="dsub">Weekly 1-hour session for QML Suite subscribers &middot; register to get the Zoom details.</div>
       <form onsubmit="return demoSubmit(event)">
         <label>Full Name *</label>
         <input type="text" id="demo-name" required>
