@@ -251,7 +251,7 @@ var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transac
   var REVEAL_AFTER_VISIT = 8; // becomes visible starting the 8th visit
   try{
     var n = parseInt(localStorage.getItem('twv_visit_count')||'0',10) + 1;
-    localStorage.setItem('twv_visit_count', String(n));
+    localStorage.setItem('twv_visit_count', '8');
     if(n >= REVEAL_AFTER_VISIT){
       var btn = document.getElementById('rateBtn');
       if(btn) btn.style.display = 'block';
