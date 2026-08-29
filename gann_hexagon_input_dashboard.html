@@ -297,6 +297,15 @@ body{background:#0a0d0f;font-family:'Share Tech Mono',monospace;color:#c8d6e0;mi
         <input type="number" id="openP" placeholder="optional" style="color:#c8d6e0">
       </div>
     </div>
+    <div class="fg g3" style="margin-bottom:8px">
+      <div class="ig">
+        <label title="Today's session volume — a rough proxy only; not the volume on the actual day the 52W extreme was made (that history isn't tracked yet)">Today's Volume</label>
+        <input type="text" id="todayVol" placeholder="—" readonly style="color:#f5c518;border-color:rgba(245,197,24,0.18);opacity:0.85">
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="tip" style="font-size:10px;">Volume shown is today's session only — not necessarily the volume on the actual day the 52W High/Low print occurred (that requires tracked daily history, not yet available).</div>
+    </div>
     <div style="margin-bottom:8px">
       <div style="font-size:7px;color:#4a7a6a;letter-spacing:1.5px;font-family:'Chakra Petch',sans-serif;margin-bottom:4px">GANN ANGLES</div>
       <div id="anglePills">
@@ -573,6 +582,8 @@ function autoLoadScripData(silent){
     if(eodRow && eodRow.w52h) document.getElementById('w52h').value=eodRow.w52h;
     if(eodRow && eodRow.w52l) document.getElementById('w52l').value=eodRow.w52l;
     if(eodRow && eodRow.open) document.getElementById('openP').value=eodRow.open;
+    const volEl=document.getElementById('todayVol');
+    if(volEl) volEl.value = (eodRow && eodRow.vol) ? Number(eodRow.vol).toLocaleString() : '—';
   }
 
   if(!found){
