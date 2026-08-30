@@ -129,6 +129,15 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 .pkg15-tier{background:#0f1b2e;border:1px solid #1a2535;border-radius:6px;padding:7px 4px;text-align:center;}
 .pkg15-tier .t-len{font-family:'Share Tech Mono',monospace;font-size:8px;color:#5a7794;letter-spacing:0.5px;}
 .pkg15-tier .t-price{font-family:'Chakra Petch',sans-serif;font-size:13px;color:#fff;font-weight:700;margin-top:2px;}
+/* ===== Trial gate (Single plan) ===== */
+.trial-box{background:#0f1b2e;border:1px solid #1a2535;border-radius:8px;padding:12px;margin-top:12px;}
+.trial-box input{width:100%;background:#0a1220;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:8px;outline:none;box-sizing:border-box;}
+.trial-box input:focus{border-color:#00b4ff88;}
+.trial-start-btn{width:100%;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px;border:0;border-radius:6px;cursor:pointer;}
+.trial-active{text-align:center;}
+.trial-days-left{font-family:'Chakra Petch',sans-serif;font-size:20px;color:#4ce27a;font-weight:700;}
+.trial-days-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:2px;}
+.trial-expired-note{font-family:'Share Tech Mono',monospace;font-size:10px;color:#ff8a5c;text-align:center;margin-bottom:8px;font-weight:700;}
 #demoOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
 #demoOverlay.on{display:flex;}
 #demoBox{width:100%;max-width:300px;background:#0a1220;border:1px solid #00b4ff44;border-radius:10px;padding:18px;box-shadow:0 0 30px rgba(0,180,255,0.10);position:relative;}
@@ -186,6 +195,7 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
         <div class="pkg15-tier"><div class="t-len">6 MONTHS</div><div class="t-price">Rs 2,500</div></div>
         <div class="pkg15-tier"><div class="t-len">1 YEAR</div><div class="t-price">Rs 4,800</div></div>
       </div>
+      <div class="trial-box" id="trialBox"></div>
     </div>
     <div class="rate-panel" data-plan="multiple">
       <div class="rate-price">Rs 25,000</div>
@@ -224,7 +234,16 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
             <div class="pkg15-tier"><div class="t-len">1 YEAR</div><div class="t-price">Rs 4,800</div></div>
           </div>
           <div id="pkg15-qr" style="text-align:center;margin:6px 0;"></div>
-          <a href="#" id="pkg15-datalink" target="_blank" style="display:block;text-align:center;background:#4ce27a;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;padding:11px;border-radius:6px;text-decoration:none;">SUBMIT PAYMENT DETAILS</a>
+          <hr class="pkg15-divider">
+          <div class="pkg15-subhead">REGISTER FOR 15-DAY CLASS</div>
+          <form onsubmit="return pkg15Submit(event)" style="margin-top:6px;">
+            <input type="text" id="pkg15-name" placeholder="Full Name *" required style="width:100%;background:#0a1220;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:8px;outline:none;box-sizing:border-box;">
+            <input type="email" id="pkg15-email" placeholder="Email *" required style="width:100%;background:#0a1220;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:8px;outline:none;box-sizing:border-box;">
+            <input type="text" id="pkg15-nominee" placeholder="Nominee (optional)" style="width:100%;background:#0a1220;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:13px;padding:9px 10px;border-radius:6px;margin-bottom:8px;outline:none;box-sizing:border-box;">
+            <button type="submit" style="width:100%;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:11px;border:0;border-radius:6px;cursor:pointer;">REGISTER</button>
+            <div id="pkg15-msg" style="font-family:'Share Tech Mono',monospace;font-size:9px;text-align:center;margin-top:6px;"></div>
+          </form>
+          <a href="#" id="pkg15-datalink" target="_blank" style="display:block;text-align:center;background:#4ce27a;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;padding:11px;border-radius:6px;text-decoration:none;margin-top:8px;">SUBMIT PAYMENT DETAILS (after paying via QR)</a>
         </div>
       </div>
     </div>
@@ -237,7 +256,61 @@ function rateShow(plan){
   document.querySelectorAll('.rate-tab').forEach(function(t){t.classList.toggle('on',t.dataset.plan===plan);});
   document.querySelectorAll('.rate-panel').forEach(function(p){p.classList.toggle('on',p.dataset.plan===plan);});
 }
-// ===== 15-Day Package: stays "pending" until the class day is fixed. =====
+// ===== Single-plan 8-day free trial =====
+// Soft, browser-only gate (no backend yet, so this is a reminder/nudge, not
+// hard enforcement \u2014 clearing localStorage resets it). Same QR/payment link
+// as the 15-Day package is reused here once the trial runs out.
+var TRIAL_DAYS = 8;
+// Subscription trial payment info \u2014 separate from the 15-Day package's QR/link.
+// Fill these once you have your subscription eSewa QR hosted.
+var TRIAL_QR_IMAGE_URL = '';
+var TRIAL_DATALINK_URL = '';
+function trialRender(){
+  var box=document.getElementById('trialBox');
+  if(!box)return;
+  var rec=null;
+  try{ rec=JSON.parse(localStorage.getItem('twv_trial')||'null'); }catch(e){}
+  if(!rec){
+    box.innerHTML='<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:#8aa4bd;margin-bottom:8px;">Start your free 8-day trial \u2014 no payment needed yet.</div>'
+      +'<input type="email" id="trialEmail" placeholder="you@email.com">'
+      +'<button class="trial-start-btn" onclick="trialStart()">START 8-DAY FREE TRIAL</button>';
+    return;
+  }
+  var elapsedDays=Math.floor((Date.now()-rec.start)/86400000);
+  var left=TRIAL_DAYS-elapsedDays;
+  if(left>0){
+    box.innerHTML='<div class="trial-active"><div class="trial-days-label">FREE TRIAL &mdash; '+rec.email+'</div><div class="trial-days-left">'+left+' day'+(left===1?'':'s')+' left</div></div>';
+  }else{
+    var qrImg = TRIAL_QR_IMAGE_URL ? '<div style="text-align:center;margin:8px 0;"><img src="'+TRIAL_QR_IMAGE_URL+'" style="max-width:150px;border-radius:8px;"></div>' : '';
+    var linkHref = TRIAL_DATALINK_URL || '#';
+    box.innerHTML='<div class="trial-expired-note">&#9203; Your free trial has ended</div>'
+      +qrImg
+      +'<a href="'+linkHref+'" target="_blank" style="display:block;text-align:center;background:#4ce27a;color:#040B16;font-family:\'Share Tech Mono\',monospace;font-size:10px;font-weight:700;padding:11px;border-radius:6px;text-decoration:none;">SUBMIT PAYMENT DETAILS</a>';
+  }
+}
+function trialStart(){
+  var email=document.getElementById('trialEmail').value.trim();
+  if(!email || !email.includes('@')){ alert('Enter a valid email to start your trial.'); return; }
+  localStorage.setItem('twv_trial', JSON.stringify({email:email, start:Date.now()}));
+  trialRender();
+}
+// 15-Day Class registration \u2014 stored separately from Demo Class registrations
+function pkg15Submit(e){
+  e.preventDefault();
+  var name=document.getElementById('pkg15-name').value.trim();
+  var email=document.getElementById('pkg15-email').value.trim();
+  var nominee=document.getElementById('pkg15-nominee').value.trim();
+  if(!name || !email){ return false; }
+  var regs=[];
+  try{ regs=JSON.parse(localStorage.getItem('twv_pkg15_registrations')||'[]'); }catch(err){}
+  regs.push({name:name, email:email, nominee:nominee, ts:new Date().toISOString()});
+  localStorage.setItem('twv_pkg15_registrations', JSON.stringify(regs));
+  document.getElementById('pkg15-msg').innerHTML='<span style="color:#4ce27a;">&#10003; Registered! Now complete payment below.</span>';
+  document.getElementById('pkg15-name').value='';
+  document.getElementById('pkg15-email').value='';
+  document.getElementById('pkg15-nominee').value='';
+  return false;
+}
 // Once you have the Zoom date, QR image, and data-collection form link, set
 // PKG15_ACTIVE = true and fill the two URLs below \u2014 the payment panel then
 // switches on automatically (still only reachable via the PRICING button click).
@@ -252,6 +325,7 @@ var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transac
     if(PKG15_QR_IMAGE_URL) document.getElementById('pkg15-qr').innerHTML='<img src="'+PKG15_QR_IMAGE_URL+'" style="max-width:160px;border-radius:8px;">';
     if(PKG15_DATALINK_URL) document.getElementById('pkg15-datalink').href=PKG15_DATALINK_URL;
   }
+  trialRender();
 })();
 // Reveal the Pricing button only after this browser has visited 8-9 times \u2014
 // before that, only the free "Paid Class" (TikTok) notice link is visible.
@@ -311,21 +385,27 @@ var DEMO_EMAILJS_TEMPLATE_ID = '';                  // <-- fill with the new tem
 function demoOpen(){document.getElementById('demoOverlay').classList.add('on');}
 function demoClose(){document.getElementById('demoOverlay').classList.remove('on');}
 function demoValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
-// Exports everyone who registered on THIS browser/device via the Demo Class form,
-// as a real Excel (.xlsx) file. Since registrations are stored per-browser
-// (no shared backend yet), this only captures signups made from this specific device.
+// Exports everyone who registered on THIS browser/device via the Demo Class
+// AND 15-Day Class forms, as a real Excel (.xlsx) file with one sheet each.
+// Since registrations are stored per-browser (no shared backend yet), this
+// only captures signups made from this specific device.
 function exportRegistrationsCSV(){
-  var regs=[];
-  try{ regs=JSON.parse(localStorage.getItem('twv_demo_registrations')||'[]'); }catch(e){}
-  if(!regs.length){ alert('No registrations recorded on this device yet.'); return; }
+  var demoRegs=[], pkg15Regs=[];
+  try{ demoRegs=JSON.parse(localStorage.getItem('twv_demo_registrations')||'[]'); }catch(e){}
+  try{ pkg15Regs=JSON.parse(localStorage.getItem('twv_pkg15_registrations')||'[]'); }catch(e){}
+  if(!demoRegs.length && !pkg15Regs.length){ alert('No registrations recorded on this device yet.'); return; }
   if(!window.XLSX){ alert('Excel export library failed to load — check your internet connection and try again.'); return; }
-  var rows=[['Name','Email','Nominee','Registered At']];
-  regs.forEach(function(r){ rows.push([r.name||'',r.email||'',r.nominee||'',r.ts||'']); });
-  var ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:22},{wch:28},{wch:22},{wch:22}];
   var wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Registrations');
-  XLSX.writeFile(wb,'demo_class_registrations_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  function addSheet(regs,name){
+    var rows=[['Name','Email','Nominee','Registered At']];
+    regs.forEach(function(r){ rows.push([r.name||'',r.email||'',r.nominee||'',r.ts||'']); });
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:22},{wch:28},{wch:22},{wch:22}];
+    XLSX.utils.book_append_sheet(wb,ws,name);
+  }
+  if(demoRegs.length) addSheet(demoRegs,'Demo Class');
+  if(pkg15Regs.length) addSheet(pkg15Regs,'15-Day Class');
+  XLSX.writeFile(wb,'twv_registrations_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 // Hidden admin-only trigger: no visible button anywhere (clients can never see or
 // click it). Only works if you add ?export=1 to the site URL yourself.
