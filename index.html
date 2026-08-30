@@ -91,24 +91,6 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 #demoBtn{position:fixed;right:16px;bottom:calc(50px + env(safe-area-inset-bottom));z-index:60;background:#00b4ff;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
 #demoBtn:hover{opacity:.9;}
 #rateBtn{position:fixed;right:16px;bottom:calc(94px + env(safe-area-inset-bottom));z-index:60;background:#f5c518;color:#040B16;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-#faqBtn{position:fixed;right:16px;bottom:calc(138px + env(safe-area-inset-bottom));z-index:60;background:#a06cf5;color:#fff;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;padding:10px 14px;border-radius:24px;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-#faqBtn:hover{opacity:.9;}
-#faqOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:flex-end;justify-content:flex-end;padding:16px;}
-#faqOverlay.on{display:flex;}
-#faqBox{width:100%;max-width:320px;max-height:70vh;background:#0a1220;border:1px solid #a06cf544;border-radius:10px;padding:16px;box-shadow:0 0 30px rgba(160,108,245,0.12);position:relative;display:flex;flex-direction:column;}
-#faqClose{position:absolute;top:10px;right:12px;background:none;border:0;color:#5a7794;font-size:18px;cursor:pointer;}
-#faqBox h3{font-size:13px;color:#fff;margin-bottom:2px;}
-#faqBox .dsub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#5a7794;margin-bottom:10px;}
-#faqLog{flex:1;overflow-y:auto;margin-bottom:10px;max-height:280px;}
-.faq-msg{font-family:'Chakra Petch',sans-serif;font-size:12px;color:#dce6f0;background:#0f1b2e;border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.5;}
-.faq-msg.user{background:#a06cf522;color:#dcc8fa;text-align:right;}
-.faq-quick{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
-.faq-quick button{background:#0f1b2e;border:1px solid #1a2535;color:#c8d6e0;font-family:'Chakra Petch',sans-serif;font-size:11px;padding:8px 10px;border-radius:6px;text-align:left;cursor:pointer;}
-.faq-quick button:hover{border-color:#a06cf588;}
-#faqInputRow{display:flex;gap:6px;}
-#faqInputRow input{flex:1;background:#0f1b2e;border:1px solid #1a2535;color:#dce6f0;font-family:'Chakra Petch',sans-serif;font-size:12px;padding:9px 10px;border-radius:6px;outline:none;}
-#faqInputRow input:focus{border-color:#a06cf588;}
-#faqInputRow button{background:#a06cf5;color:#fff;font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:700;padding:0 14px;border:0;border-radius:6px;cursor:pointer;}
 #rateBtn:hover{opacity:.9;}
 #rateOverlay{position:fixed;inset:0;background:rgba(4,11,22,0.7);z-index:70;display:none;align-items:center;justify-content:center;padding:16px;}
 #rateOverlay.on{display:flex;}
@@ -189,11 +171,10 @@ html,body{height:100%;background:#040B16;font-family:'Chakra Petch',sans-serif;}
 #paidTicker:hover .ticker-track{animation-play-state:paused;}
 @keyframes paidScroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
 </style>
-<div id="paidTicker" onclick="window.open('https://www.tiktok.com/@rajjjyinwy4/playlist/Information-7643681830176164625?is_from_webapp=1&sender_device=pc','_blank')">
-  <span class="ticker-track">&#127916;&nbsp; PAID CLASS &mdash; tap here for full class playlist on TikTok &nbsp;&#8226;&nbsp; &#127916;&nbsp; PAID CLASS &mdash; tap here for full class playlist on TikTok &nbsp;&#8226;&nbsp;</span>
+<div id="paidTicker" onclick="rateOpen()">
+  <span class="ticker-track">&#128218;&nbsp; 15-DAY CLASS OPEN &mdash; 90 min/day, live on Zoom &mdash; tap here to register &nbsp;&#8226;&nbsp; &#128218;&nbsp; 15-DAY CLASS OPEN &mdash; 90 min/day, live on Zoom &mdash; tap here to register &nbsp;&#8226;&nbsp;</span>
 </div>
 <button id="rateBtn" onclick="rateOpen()" style="display:none;">&#128176; PRICING</button>
-<button id="faqBtn" onclick="faqOpen()">&#128172; ASK A QUESTION</button>
 <div id="rateOverlay">
   <div id="rateBox">
     <button id="rateClose" onclick="rateClose()">&times;</button>
@@ -333,7 +314,7 @@ function pkg15Submit(e){
 // Once you have the Zoom date, QR image, and data-collection form link, set
 // PKG15_ACTIVE = true and fill the two URLs below \u2014 the payment panel then
 // switches on automatically (still only reachable via the PRICING button click).
-var PKG15_ACTIVE = false;
+var PKG15_ACTIVE = true;
 var PKG15_QR_IMAGE_URL = ''; // e.g. a hosted image of the eSewa QR
 var PKG15_DATALINK_URL = ''; // e.g. a Google Form to collect name/email/transaction ID after payment
 (function(){
@@ -646,87 +627,5 @@ window.addEventListener('message',function(e){
 document.getElementById('frame-qml').addEventListener('load',function(){this.dataset.loaded='1';});
 </script>
 
-<!-- ===== FAQ chatbot widget ===== -->
-<div id="faqOverlay">
-  <div id="faqBox">
-    <button id="faqClose" onclick="faqClose()">&times;</button>
-    <h3>Ask a Question</h3>
-    <div class="dsub">Instant answers to common questions.</div>
-    <div id="faqLog"></div>
-    <div class="faq-quick" id="faqQuick"></div>
-    <div id="faqInputRow">
-      <input type="text" id="faqInput" placeholder="Type your question..." onkeydown="if(event.key==='Enter')faqAsk()">
-      <button onclick="faqAsk()">ASK</button>
-    </div>
-  </div>
-</div>
-<script>
-// Simple keyword-matched FAQ chatbot \u2014 no server, all client-side.
-var FAQ = [
-  { q:'What are the prices and durations?',
-    keys:['price','cost','rate','duration','month','how much'],
-    a:'1 Month \u2014 Rs 500<br>3 Months \u2014 Rs 1,300<br>6 Months \u2014 Rs 2,500<br>1 Year \u2014 Rs 4,800' },
-  { q:'Price for 2-8 people?',
-    keys:['2 8','5 8','5-8'],
-    a:'Rs 25,000/year flat \u2014 same rate for any group size from 2 to 8 people, covers everyone.' },
-  { q:'More than 8 people?',
-    keys:['more than 8','bulk','institution','99','large group','8 people'],
-    a:'For larger groups, please send your details (office contact person, area) and message us at <b>9808660880</b> (message only) for a custom quote.' },
-  { q:'What indicators is this based on?',
-    keys:['indicator','based on','methodology','how does it work','qml mean'],
-    a:'QML = <b>Q</b>uantitative, <b>M</b>omentum, <b>L</b>evel \u2014 combining data-driven analysis, price momentum, and key support/resistance levels.' },
-  { q:'Is this live or end-of-day data?',
-    keys:['live','real time','realtime','intraday','eod','end of day'],
-    a:'All plans are EOD (End-of-Day) based \u2014 data updates after market close, not live/intraday during trading hours.' }
-];
-function faqLog(html, isUser){
-  var log=document.getElementById('faqLog');
-  var d=document.createElement('div');
-  d.className='faq-msg'+(isUser?' user':'');
-  d.innerHTML=html;
-  log.appendChild(d);
-  log.scrollTop=log.scrollHeight;
-}
-function faqRenderQuick(){
-  var q=document.getElementById('faqQuick');
-  q.innerHTML='';
-  FAQ.forEach(function(item,i){
-    var b=document.createElement('button');
-    b.textContent=item.q;
-    b.onclick=function(){ faqLog(item.q, true); faqLog(item.a, false); };
-    q.appendChild(b);
-  });
-}
-function faqMatch(text){
-  var t=text.toLowerCase();
-  for(var i=0;i<FAQ.length;i++){
-    for(var j=0;j<FAQ[i].keys.length;j++){
-      if(t.indexOf(FAQ[i].keys[j])!==-1) return FAQ[i];
-    }
-  }
-  return null;
-}
-function faqAsk(){
-  var input=document.getElementById('faqInput');
-  var text=input.value.trim();
-  if(!text)return;
-  faqLog(text, true);
-  var match=faqMatch(text);
-  if(match){
-    faqLog(match.a, false);
-  }else{
-    faqLog('Not sure on that one \u2014 message us directly at <b>9808660880</b> and we\'ll answer personally.', false);
-  }
-  input.value='';
-}
-function faqOpen(){
-  document.getElementById('faqOverlay').classList.add('on');
-  if(!document.getElementById('faqLog').children.length){
-    faqLog('Hi! Pick a question below or type your own.', false);
-    faqRenderQuick();
-  }
-}
-function faqClose(){ document.getElementById('faqOverlay').classList.remove('on'); }
-</script>
 </body>
 </html>
