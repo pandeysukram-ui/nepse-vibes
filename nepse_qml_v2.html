@@ -28,6 +28,11 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .brand-name{font-size:12px;font-weight:700;letter-spacing:3px;color:#fff;text-transform:uppercase;}
 .brand-sub{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1.5px;}
+.socialMini{display:flex;align-items:center;gap:7px;flex-shrink:0;margin-left:4px;}
+.socialMini a{display:inline-flex;width:20px;height:20px;transition:transform .15s;opacity:.92;}
+.socialMini a:hover{transform:translateY(-1px) scale(1.15);opacity:1;}
+.socialMini svg{width:100%;height:100%;display:block;}
+.socialMini.sm a{width:16px;height:16px;}
 /* TABS */
 .tabs{display:flex;border-bottom:1px solid var(--border2);background:var(--bg2);padding:0 20px;overflow-x:auto;}
 .tab{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:10px 13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
@@ -423,6 +428,7 @@ button{font-family:var(--head);cursor:pointer;border:none;border-radius:3px;lett
       <div class="brand-name">Trade With Vibes — nepsevibes.com</div>
       <div class="brand-sub">QML DASHBOARD v2.0 · NEPSE · ALL 13 SECTORS · AUTO-SAVE</div>
     </div>
+    <div class="socialMini"><a data-soc="facebook" target="_blank" rel="noopener" title="Facebook — Sukram Pandey" aria-label="facebook"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#1877F2"/><path d="M17.6 25v-8h2.7l.4-3.2h-3.1v-2c0-.9.3-1.5 1.600-1.500h1.700V7.4c-.3 0-1.300-.1-2.400-.1-2.400 0-4 1.500-4 4.100v2.400h-2.700V17h2.700v8z" fill="#fff"/></svg></a><a data-soc="youtube" target="_blank" rel="noopener" title="YouTube — Trade With Vibes" aria-label="youtube"><svg viewBox="0 0 32 32"><rect x="1" y="6" width="30" height="20" rx="6" fill="#FF0000"/><path d="M13 11.500v9l8-4.500z" fill="#fff"/></svg></a><a data-soc="blog" target="_blank" rel="noopener" title="Blog — tradevibes.blogspot.com" aria-label="blog"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#FF5722"/><path d="M11 8h6.500a4.500 4.500 0 0 1 4.500 4.500v.800h-1.800a1.700 1.700 0 0 0-1.700 1.700H21a2.500 2.500 0 0 1 2 2.400V20a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4z" fill="#fff"/><rect x="11" y="12.500" width="5" height="2.200" rx="1.100" fill="#FF5722"/><rect x="11" y="17.200" width="8" height="2.200" rx="1.100" fill="#FF5722"/></svg></a><a data-soc="whatsapp" target="_blank" rel="noopener" title="WhatsApp" aria-label="whatsapp"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#25D366"/><path d="M16 6.500a9.500 9.500 0 0 0-8.100 14.400L6.500 25.500l4.800-1.300A9.500 9.500 0 1 0 16 6.500z" fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round"/><path d="M12.300 11.800c.3-.5.700-.5 1-.4l.8 1.800c.1.300-.5.900-.7 1.200.7 1.300 1.700 2.200 3 2.800.3-.3.800-1 1.100-1l1.800.9c.2.200 0 1.100-.7 1.600-.8.500-1.900.4-3.400-.3-2.200-1.100-3.600-3-4.100-4.300-.3-.9 0-1.800.5-2.300z" fill="#fff"/></svg></a></div>
   </div>
   <button id="qmlVoiceBtn" onclick="speakQMLSnapshot()" style="background:rgba(0,230,118,0.12);border:1px solid #00e676;color:#00e676;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 14px;border-radius:5px;cursor:pointer;letter-spacing:1px;margin-left:auto;margin-right:10px;">🔊 READ ALOUD</button>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -1704,12 +1710,23 @@ Sector notes..." oninput="saveWkState()"></textarea>
   <div style="display:flex;gap:16px;align-items:center;">
     <a class="footer-link" href="https://nepsevibes.com" target="_blank">◆ nepsevibes.com</a>
     <a class="footer-link" href="https://tradevibes.blogspot.com/" target="_blank">◆ tradevibes.blogspot.com</a>
+    <div class="socialMini sm"><a data-soc="facebook" target="_blank" rel="noopener" title="Facebook — Sukram Pandey" aria-label="facebook"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#1877F2"/><path d="M17.6 25v-8h2.7l.4-3.2h-3.1v-2c0-.9.3-1.5 1.600-1.500h1.700V7.4c-.3 0-1.300-.1-2.400-.1-2.400 0-4 1.500-4 4.100v2.400h-2.700V17h2.700v8z" fill="#fff"/></svg></a><a data-soc="youtube" target="_blank" rel="noopener" title="YouTube — Trade With Vibes" aria-label="youtube"><svg viewBox="0 0 32 32"><rect x="1" y="6" width="30" height="20" rx="6" fill="#FF0000"/><path d="M13 11.500v9l8-4.500z" fill="#fff"/></svg></a><a data-soc="blog" target="_blank" rel="noopener" title="Blog — tradevibes.blogspot.com" aria-label="blog"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#FF5722"/><path d="M11 8h6.500a4.500 4.500 0 0 1 4.500 4.500v.800h-1.800a1.700 1.700 0 0 0-1.700 1.700H21a2.500 2.500 0 0 1 2 2.400V20a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4z" fill="#fff"/><rect x="11" y="12.500" width="5" height="2.200" rx="1.100" fill="#FF5722"/><rect x="11" y="17.200" width="8" height="2.200" rx="1.100" fill="#FF5722"/></svg></a><a data-soc="whatsapp" target="_blank" rel="noopener" title="WhatsApp" aria-label="whatsapp"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#25D366"/><path d="M16 6.500a9.500 9.500 0 0 0-8.100 14.400L6.500 25.500l4.800-1.300A9.500 9.500 0 1 0 16 6.500z" fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round"/><path d="M12.300 11.800c.3-.5.700-.5 1-.4l.8 1.800c.1.300-.5.900-.7 1.200.7 1.300 1.700 2.200 3 2.800.3-.3.800-1 1.100-1l1.800.9c.2.200 0 1.100-.7 1.600-.8.500-1.900.4-3.400-.3-2.200-1.100-3.600-3-4.100-4.300-.3-.9 0-1.800.5-2.300z" fill="#fff"/></svg></a></div>
   </div>
   <div class="footer-time">QML DASHBOARD v2.0 · TRADE WITH VIBES · DATA: SHAREHUBNEPAL.COM</div>
 </div>
 
 
 
+<script>
+// ---- Social icons. Paste exact links between the quotes to change them ----
+var SOCIAL_LINKS = {
+  facebook: 'https://www.facebook.com/sukram.pandey.9',
+  youtube:  'https://www.youtube.com/channel/UCPwfj8f5p2oj9Dmd0fnzcsg',
+  blog:     'https://tradevibes.blogspot.com',
+  whatsapp: 'https://wa.me/9779808660880'
+};
+document.querySelectorAll('a[data-soc]').forEach(function(a){ a.href = SOCIAL_LINKS[a.getAttribute('data-soc')]; });
+</script>
 <div class="toast" id="toast">✓ NMB LTP:272.30 52H:272.70 52L:230.00</div>
 <script>
 // ==============================
